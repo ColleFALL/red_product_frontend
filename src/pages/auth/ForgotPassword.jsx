@@ -11,9 +11,9 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-neutral-800">
+    <div className="min-h-screen relative overflow-hidden ">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-1200 to-black" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
@@ -46,7 +46,7 @@ export default function ForgotPassword() {
 
               <button
                 type="submit"
-                className="w-full h-12 rounded-md bg-black text-[17px] text-[#FFFFFF] font-semibold hover:bg-neutral-800 transition"
+                className="w-full h-12 rounded-md bg-neutral-600 text-[17px] text-[#FFFFFF] font-semibold hover:bg-neutral-800 transition"
               >
                 Envoyer
               </button>

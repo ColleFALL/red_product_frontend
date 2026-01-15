@@ -23,7 +23,7 @@ export default function Register() {
     e.preventDefault();
     setStatus({ type: "loading", message: "Création..." });
 
-    // ✅ petit contrôle (optionnel mais utile)
+    //  petit contrôle (optionnel mais utile)
     if (!form.accept) {
       return setStatus({
         type: "error",
@@ -40,7 +40,7 @@ export default function Register() {
 
       setStatus({ type: "success", message: "Compte créé ! Connectez-vous." });
 
-      // ✅ tu voulais : inscription -> page connexion -> puis dashboard
+      //  tu voulais : inscription -> page connexion -> puis dashboard
       navigate("/", { replace: true });
     } catch (err) {
       console.error(err);
@@ -52,10 +52,9 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-neutral-800">
+    <div className="min-h-screen relative overflow-hidden ">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-1200 to-black" />
-
+      <div className="absolute inset-0 bg-black/70" />
       <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           {/* Logo */}
@@ -118,7 +117,7 @@ export default function Register() {
 
               <button
                 type="submit"
-                className="w-full h-12 rounded-md bg-black text-[17px] text-[#FFFFFF] font-semibold hover:bg-neutral-900 transition"
+                className="w-full h-12 rounded-md bg-neutral-600 text-[17px] text-[#FFFFFF] font-semibold hover:bg-neutral-900 transition"
               >
                 S'inscrire
               </button>

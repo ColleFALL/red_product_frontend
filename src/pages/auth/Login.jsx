@@ -43,9 +43,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-neutral-800">
+    <div className="min-h-screen relative overflow-hidden ">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-1200 to-black" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
@@ -97,7 +97,7 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="w-full h-12 rounded-md bg-black text-[#FFFFFF] text-[17px] font-semibold hover:bg-neutral-800 transition"
+                className="w-full h-12 rounded-md bg-neutral-600 text-[#FFFFFF] text-[17px] font-semibold hover:bg-neutral-800 transition"
               >
                 Se connecter
               </button>
