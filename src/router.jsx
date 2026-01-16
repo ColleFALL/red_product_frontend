@@ -8,6 +8,8 @@ import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import HotelsList from "./pages/hotels/HotelsList";
 import HotelCreate from "../src/pages/hotels/HotelCreate";
+// import HotelDetails from "./pages/hotels/HotelDetails";
+// import HotelEdit from "./pages/hotels/HotelEdit";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -21,14 +23,24 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Dashboard /> }, // /dashboard
-      { path: "hotels", element: <HotelsList /> }, // /dashboard/hotels
-      { path: "hotels/create", element: <HotelCreate /> },
+      {
+      path: "hotels",
+      element: <HotelsList />,
+      children: [
+        { path: "new", element: <HotelCreate /> }, // ✅ modal
+      // { path: "hotels/:id", element: <HotelDetails /> },
+    // { path: "hotels/:id/edit", element: <HotelEdit /> },
     ],
+  
+      }
+    ]
   },
 
   // ✅ compatibilité avec ton ancien chemin
-  {
-    path: "/dashboard/dashboard",
-    element: <Navigate to="/dashboard" replace />,
-  },
+  // {
+  //   path: "/dashboard/dashboard",
+  //   element: <Navigate to="/dashboard" replace />,
+  // },
+  { path: "hotels/create", element: <Navigate to="/dashboard/hotels/new" replace /> },
+
 ]);

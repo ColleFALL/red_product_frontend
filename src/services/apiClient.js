@@ -1,10 +1,10 @@
-const BASE_URL = import.meta.env.VITE_API_URL; // ex: https://...onrender.com/api
+const BASE_URL = import.meta.env.VITE_API_URL; 
 
 if (!BASE_URL) {
   // Ça aide à détecter un oubli de variable d'environnement
   console.log("API BASE URL =", import.meta.env.VITE_API_URL);
 
-  console.log("🚀 BASE_URL =", BASE_URL);
+  console.log("BASE_URL =", BASE_URL);
 }
 
 export function getToken() {

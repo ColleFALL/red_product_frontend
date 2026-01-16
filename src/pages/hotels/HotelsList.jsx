@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import HotelCard from "../../components/hotels/HotelCard";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Outlet , Link } from "react-router-dom";
 
 export default function HotelsList() {
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export default function HotelsList() {
           {/*  Bouton créer */}
           <button
             type="button"
-            onClick={() => navigate("/dashboard/hotels/create")}
+            onClick={() => navigate("new")}
             className="h-10 px-4 rounded-lg bg-white border border-neutral-200 text-sm text-neutral-700 hover:bg-neutral-50 transition flex items-center gap-2"
           >
             <span className="text-lg leading-none">+</span>
@@ -125,6 +125,7 @@ export default function HotelsList() {
           ))}
         </div>
       </div>
+       <Outlet />
     </div>
   );
 }
