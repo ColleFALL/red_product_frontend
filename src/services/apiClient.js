@@ -4,7 +4,7 @@ if (!BASE_URL) {
   // Ça aide à détecter un oubli de variable d'environnement
   console.log("API BASE URL =", import.meta.env.VITE_API_URL);
 
-  console.warn("VITE_API_URL is missing. Set it in Vercel/your .env");
+  console.log("🚀 BASE_URL =", BASE_URL);
 }
 
 export function getToken() {
