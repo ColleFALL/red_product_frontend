@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX, FiImage } from "react-icons/fi";
-import { createHotel } from "../../services/hotels";
+// import { createHotel } from "./HotelsList";
 
 export default function HotelCreate() {
   const navigate = useNavigate();
