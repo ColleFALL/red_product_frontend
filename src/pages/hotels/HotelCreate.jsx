@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX, FiImage } from "react-icons/fi";
+import { createHotel } from "../../services/hotels";
 
 export default function HotelCreate() {
   const navigate = useNavigate();
@@ -43,14 +44,27 @@ export default function HotelCreate() {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // ✅ TODO: branche API ici (FormData)
-    // await createHotel(form)
+  try {
+    await createHotel({
+      nom: form.nom,
+      adresse: form.adresse,
+      email: form.email,
+      telephone: form.telephone,
+      prix_par_nuit: form.prix_par_nuit,
+      devise: form.devise,
+      photo: form.photo,
+    });
 
-    alert("Hotel enregistré (statique). Branche l'API après.");
-    close();
-  };
+    alert("Hôtel créé !");
+    navigate(".."); // ferme la modal => /dashboard/hotels
+  } catch (err) {
+    console.error(err);
+    alert("Erreur création hôtel. Regarde la console (F12).");
+  }
+};
+
 
   return (
     <div className="fixed inset-0 z-50">
