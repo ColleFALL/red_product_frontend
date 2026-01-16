@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { mockLogin } from "../../services/authMock";
+// import { mockLogin } from "../../services/authMock";
+import { loginApi } from "../../services/authApi";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -23,10 +24,12 @@ export default function Login() {
     setStatus({ type: "loading", message: "Connexion..." });
 
     try {
-      const res = await mockLogin({
+      const res = await loginApi({
         email: form.email,
         password: form.password,
+        remember: form.remember,
       });
+      navigate("/dashboard");
 
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
@@ -63,7 +66,11 @@ export default function Login() {
               Connectez-vous en tant que Admin
             </h2>
 
-            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              autoComplete="off"
+              className="space-y-6"
+            >
               <input
                 autoComplete="email"
                 type="email"
@@ -105,9 +112,7 @@ export default function Login() {
               {status.message && (
                 <p
                   className={`text-sm ${
-                    status.type === "error"
-                      ? "text-red-600"
-                      : "text-green-600"
+                    status.type === "error" ? "text-red-600" : "text-green-600"
                   }`}
                 >
                   {status.message}
