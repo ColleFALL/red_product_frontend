@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX, FiImage } from "react-icons/fi";
 // import { createHotel } from "./HotelsList";
+// import HotelCreate from "../hotels/HotelsList"
 
 export default function HotelCreate() {
   const navigate = useNavigate();
@@ -43,27 +44,41 @@ export default function HotelCreate() {
     setForm((p) => ({ ...p, photo: file, photoPreview: preview }));
   };
 
-  const onSubmit = async (e) => {
+ const onSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    await createHotel({
-      nom: form.nom,
-      adresse: form.adresse,
-      email: form.email,
-      telephone: form.telephone,
-      prix_par_nuit: form.prix_par_nuit,
-      devise: form.devise,
-      photo: form.photo,
+    const token = localStorage.getItem("token"); // si ton API est protégée
+    const fd = new FormData();
+
+    fd.append("nom", form.nom);
+    fd.append("adresse", form.adresse);
+    fd.append("email", form.email);
+    fd.append("telephone", form.telephone);
+    fd.append("prix_par_nuit", form.prix_par_nuit);
+    fd.append("devise", form.devise);
+
+    // IMPORTANT : le champ image
+    if (form.photo) fd.append("photo", form.photo); 
+    // ⚠️ si ton backend attend "image" au lieu de "photo", change ici.
+
+    const res = await fetch(`https://red-product-backend-eymz.onrender.com/api/hotels`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: fd, // FormData => ne mets PAS Content-Type
     });
 
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || "Erreur API");
+
     alert("Hôtel créé !");
-    navigate(".."); // ferme la modal => /dashboard/hotels
+    navigate("..");
   } catch (err) {
     console.error(err);
-    alert("Erreur création hôtel. Regarde la console (F12).");
+    alert(err?.message || "Erreur création hôtel. Regarde la console (F12).");
   }
 };
+
 
 
   return (
