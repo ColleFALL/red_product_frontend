@@ -29,6 +29,12 @@ export default function HotelCreate() {
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line
   }, []);
+  useEffect(() => {
+  return () => {
+    if (form.photoPreview) URL.revokeObjectURL(form.photoPreview);
+  };
+}, [form.photoPreview]);
+
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -48,6 +54,12 @@ export default function HotelCreate() {
   e.preventDefault();
 
   try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Tu n'es pas connecté. Connecte-toi d'abord.");
+      return;
+    }
+
     const fd = new FormData();
     fd.append("nom", form.nom);
     fd.append("adresse", form.adresse);
@@ -55,27 +67,50 @@ export default function HotelCreate() {
     fd.append("telephone", form.telephone);
     fd.append("prix_par_nuit", form.prix_par_nuit);
     fd.append("devise", form.devise);
-    if (form.photo) fd.append("image", form.photo); // ⚠️ image
+
+    // Le backend Django attend souvent "photo" SI ton serializer a un ImageField "photo".
+    if (form.photo) fd.append("photo", form.photo);
 
     const res = await fetch(
-      "https://red-product-backend-eymz.onrender.com/api/hotel",
+      "https://red-product-backend-eymz.onrender.com/api/hotels/",
       {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // 👉 si TokenAuth: `Token ${token}`
+        },
         body: fd,
       }
     );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Erreur API");
+    const ct = res.headers.get("content-type") || "";
+    const text = await res.text();
+    const data = ct.includes("application/json") ? JSON.parse(text) : text;
 
-    alert("✅ Hôtel créé avec succès");
+    if (res.status === 401) {
+      throw new Error(
+        "401: Non autorisé. Token invalide/expiré ou mauvais format (Bearer vs Token)."
+      );
+    }
+
+    if (!res.ok) {
+      // DRF renvoie souvent un objet {field: ["msg"]} en 400
+      const msg =
+        typeof data === "string"
+          ? data.slice(0, 120)
+          : data?.detail ||
+            data?.message ||
+            JSON.stringify(data).slice(0, 200);
+
+      throw new Error(`Erreur API (${res.status}) : ${msg}`);
+    }
+
+    alert("Hôtel créé !");
     navigate("..");
   } catch (err) {
-    alert("❌ " + err.message);
     console.error(err);
+    alert(err?.message || "Erreur création hôtel.");
   }
 };
-
 
 
 
