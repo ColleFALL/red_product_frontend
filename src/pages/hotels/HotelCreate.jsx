@@ -76,7 +76,7 @@ export default function HotelCreate() {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // 👉 si TokenAuth: `Token ${token}`
+          Authorization: `Token ${token}`, // 👉 si TokenAuth: `Token ${token}`
         },
         body: fd,
       }
