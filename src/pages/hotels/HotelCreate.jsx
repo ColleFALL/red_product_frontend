@@ -27,6 +27,7 @@ export default function HotelCreate() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    fetchHotels();
     // eslint-disable-next-line
   }, []);
   useEffect(() => {
