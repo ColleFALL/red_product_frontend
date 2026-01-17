@@ -133,12 +133,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import HotelCard from "../../components/hotels/HotelCard";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
-
+const API = (import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com")
+  .replace(/\/+$/, ""); // enlève slash final
 export default function HotelsList() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const API = import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
+  // const API = import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
 
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -149,16 +150,28 @@ export default function HotelsList() {
 
   // const API = import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
 
+
+
 const fetchHotels = async () => {
   try {
     const token = localStorage.getItem("access");
-    const res = await fetch(`${API}/api/hotels/`, {
+    const url = `${API}/api/hotels/`;
+    console.log("GET HOTELS:", url);
+
+    const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const data = await res.json(); // ✅ data défini ici
+    const ct = res.headers.get("content-type") || "";
+    const raw = await res.text();
 
-    if (!res.ok) throw new Error(data?.detail || "Erreur API");
+    // ✅ data défini dans tous les cas
+    const data = ct.includes("application/json") ? JSON.parse(raw) : raw;
+
+    if (!res.ok) {
+      const msg = typeof data === "string" ? data.slice(0, 200) : (data?.detail || "");
+      throw new Error(`Erreur API (${res.status}) : ${msg}`);
+    }
 
     const list = Array.isArray(data) ? data : data?.results || [];
     setHotels(list);
@@ -167,6 +180,7 @@ const fetchHotels = async () => {
     setHotels([]);
   }
 };
+
 
 
   // ✅ Recharge au montage + quand on revient de /new vers la liste
