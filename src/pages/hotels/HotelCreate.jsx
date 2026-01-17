@@ -50,13 +50,13 @@ export default function HotelCreate() {
     setForm((p) => ({ ...p, photo: file, photoPreview: preview }));
   };
 
- const onSubmit = async (e) => {
+const onSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access");
     if (!token) {
-      alert("Tu n'es pas connecté. Connecte-toi d'abord.");
+      alert("Access token introuvable. Reconnecte-toi.");
       return;
     }
 
@@ -67,40 +67,29 @@ export default function HotelCreate() {
     fd.append("telephone", form.telephone);
     fd.append("prix_par_nuit", form.prix_par_nuit);
     fd.append("devise", form.devise);
-
-    // Le backend Django attend souvent "photo" SI ton serializer a un ImageField "photo".
     if (form.photo) fd.append("photo", form.photo);
 
     const res = await fetch(
       "https://red-product-backend-eymz.onrender.com/api/hotels/",
       {
         method: "POST",
-        headers: {
-          Authorization: `Token ${token}`, // 👉 si TokenAuth: `Token ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: fd,
       }
     );
 
     const ct = res.headers.get("content-type") || "";
-    const text = await res.text();
-    const data = ct.includes("application/json") ? JSON.parse(text) : text;
+    const raw = await res.text();
+    const data = ct.includes("application/json") ? JSON.parse(raw) : raw;
 
     if (res.status === 401) {
-      throw new Error(
-        "401: Non autorisé. Token invalide/expiré ou mauvais format (Bearer vs Token)."
-      );
+      throw new Error("401: access expiré. Reconnecte-toi.");
     }
-
     if (!res.ok) {
-      // DRF renvoie souvent un objet {field: ["msg"]} en 400
       const msg =
         typeof data === "string"
-          ? data.slice(0, 120)
-          : data?.detail ||
-            data?.message ||
-            JSON.stringify(data).slice(0, 200);
-
+          ? data.slice(0, 200)
+          : data?.detail || JSON.stringify(data).slice(0, 200);
       throw new Error(`Erreur API (${res.status}) : ${msg}`);
     }
 
@@ -108,7 +97,7 @@ export default function HotelCreate() {
     navigate("..");
   } catch (err) {
     console.error(err);
-    alert(err?.message || "Erreur création hôtel.");
+    alert(err.message || "Erreur création hôtel.");
   }
 };
 
