@@ -147,35 +147,27 @@ export default function HotelsList() {
   // 🔍 Filtre
   const [query, setQuery] = useState("");
 
-  const fetchHotels = async () => {
-    setLoading(true);
-    setError("");
+  // const API = import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
 
-    try {
-      const token = localStorage.getItem("access"); // ✅ JWT access
-      if (!token) throw new Error("Token manquant. Reconnecte-toi.");
+const fetchHotels = async () => {
+  try {
+    const token = localStorage.getItem("access");
+    const res = await fetch(`${API}/api/hotels/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      const res = await fetch(`${API}/api/hotels/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const data = await res.json(); // ✅ data défini ici
 
-      const ct = res.headers.get("content-type") || "";
-      const raw = await res.text();
-      const data = ct.includes("application/json") ? JSON.parse(raw) : raw;
+    if (!res.ok) throw new Error(data?.detail || "Erreur API");
 
-      if (res.status === 401) throw new Error("401: Non autorisé. Reconnecte-toi.");
-      if (!res.ok) throw new Error(`Erreur API (${res.status})`);
+    const list = Array.isArray(data) ? data : data?.results || [];
+    setHotels(list);
+  } catch (e) {
+    console.error(e);
+    setHotels([]);
+  }
+};
 
-      // DRF peut renvoyer une liste directe OU {results: []} si pagination
-      const list = Array.isArray(data) ? data : data?.results || [];
-      setHotels(list);
-    } catch (e) {
-      setError(e.message || "Erreur chargement hôtels");
-      setHotels([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // ✅ Recharge au montage + quand on revient de /new vers la liste
   useEffect(() => {

@@ -31,11 +31,10 @@ export default function HotelCreate() {
     // eslint-disable-next-line
   }, []);
   useEffect(() => {
-  return () => {
-    if (form.photoPreview) URL.revokeObjectURL(form.photoPreview);
-  };
-}, [form.photoPreview]);
-
+    return () => {
+      if (form.photoPreview) URL.revokeObjectURL(form.photoPreview);
+    };
+  }, [form.photoPreview]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -51,58 +50,59 @@ export default function HotelCreate() {
     setForm((p) => ({ ...p, photo: file, photoPreview: preview }));
   };
 
-const onSubmit = async (e) => {
-  e.preventDefault();
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      alert("Access token introuvable. Reconnecte-toi.");
-      return;
-    }
-
-    const fd = new FormData();
-    fd.append("nom", form.nom);
-    fd.append("adresse", form.adresse);
-    fd.append("email", form.email);
-    fd.append("telephone", form.telephone);
-    fd.append("prix_par_nuit", form.prix_par_nuit);
-    fd.append("devise", form.devise);
-    if (form.photo) fd.append("photo", form.photo);
-
-    const res = await fetch(
-      "https://red-product-backend-eymz.onrender.com/api/hotels/",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
+    try {
+      const token = localStorage.getItem("access");
+      if (!token) {
+        alert("Access token introuvable. Reconnecte-toi.");
+        return;
       }
-    );
 
-    const ct = res.headers.get("content-type") || "";
-    const raw = await res.text();
-    const data = ct.includes("application/json") ? JSON.parse(raw) : raw;
+      const fd = new FormData();
+      fd.append("nom", form.nom);
+      fd.append("adresse", form.adresse);
+      fd.append("email", form.email);
+      fd.append("telephone", form.telephone);
+      fd.append("prix_par_nuit", form.prix_par_nuit);
+      fd.append("devise", form.devise);
+      if (form.photo) fd.append("photo", form.photo);
 
-    if (res.status === 401) {
-      throw new Error("401: access expiré. Reconnecte-toi.");
+      const API =
+        import.meta.env.VITE_API_URL ||
+        "https://red-product-backend-eymz.onrender.com";
+
+      const res = await fetch(`${API}/api/hotels/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // JWT access
+        },
+        body: fd, // FormData (ne PAS mettre Content-Type)
+      });
+
+      const ct = res.headers.get("content-type") || "";
+      const raw = await res.text();
+      const data = ct.includes("application/json") ? JSON.parse(raw) : raw;
+
+      if (res.status === 401) {
+        throw new Error("401: access expiré. Reconnecte-toi.");
+      }
+      if (!res.ok) {
+        const msg =
+          typeof data === "string"
+            ? data.slice(0, 200)
+            : data?.detail || JSON.stringify(data).slice(0, 200);
+        throw new Error(`Erreur API (${res.status}) : ${msg}`);
+      }
+
+      alert("Hôtel créé !");
+      navigate("..");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Erreur création hôtel.");
     }
-    if (!res.ok) {
-      const msg =
-        typeof data === "string"
-          ? data.slice(0, 200)
-          : data?.detail || JSON.stringify(data).slice(0, 200);
-      throw new Error(`Erreur API (${res.status}) : ${msg}`);
-    }
-
-    alert("Hôtel créé !");
-    navigate("..");
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Erreur création hôtel.");
-  }
-};
-
-
+  };
 
   return (
     <div className="fixed inset-0 z-50">
@@ -207,7 +207,9 @@ const onSubmit = async (e) => {
 
             {/* photo */}
             <div className="mt-6">
-              <div className="text-xs text-neutral-500 mb-2">Ajouter une photo</div>
+              <div className="text-xs text-neutral-500 mb-2">
+                Ajouter une photo
+              </div>
 
               <input
                 ref={fileRef}
@@ -233,7 +235,9 @@ const onSubmit = async (e) => {
                     <div className="w-12 h-12 rounded-lg bg-white border border-neutral-200 flex items-center justify-center text-neutral-500">
                       <FiImage />
                     </div>
-                    <div className="text-sm text-neutral-500">Ajouter une photo</div>
+                    <div className="text-sm text-neutral-500">
+                      Ajouter une photo
+                    </div>
                   </>
                 )}
               </button>
