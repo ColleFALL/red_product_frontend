@@ -48,36 +48,34 @@ export default function HotelCreate() {
   e.preventDefault();
 
   try {
-    const token = localStorage.getItem("token"); // si ton API est protégée
     const fd = new FormData();
-
     fd.append("nom", form.nom);
     fd.append("adresse", form.adresse);
     fd.append("email", form.email);
     fd.append("telephone", form.telephone);
     fd.append("prix_par_nuit", form.prix_par_nuit);
     fd.append("devise", form.devise);
+    if (form.photo) fd.append("image", form.photo); // ⚠️ image
 
-    // IMPORTANT : le champ image
-    if (form.photo) fd.append("photo", form.photo); 
-    // ⚠️ si ton backend attend "image" au lieu de "photo", change ici.
-
-    const res = await fetch(`https://red-product-backend-eymz.onrender.com/api/hotels`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      body: fd, // FormData => ne mets PAS Content-Type
-    });
+    const res = await fetch(
+      "https://red-product-backend-eymz.onrender.com/api/hotel",
+      {
+        method: "POST",
+        body: fd,
+      }
+    );
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Erreur API");
+    if (!res.ok) throw new Error(data.message || "Erreur API");
 
-    alert("Hôtel créé !");
+    alert("✅ Hôtel créé avec succès");
     navigate("..");
   } catch (err) {
+    alert("❌ " + err.message);
     console.error(err);
-    alert(err?.message || "Erreur création hôtel. Regarde la console (F12).");
   }
 };
+
 
 
 
