@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiGrid, FiHome, FiLogOut } from "react-icons/fi";
+import { clearToken } from "../../services/apiClient"; // adapte le chemin si besoin
 
 export default function Sidebar({ onNavigate }) {
   const linkClass = ({ isActive }) =>
@@ -10,10 +11,10 @@ export default function Sidebar({ onNavigate }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user"); // si tu le stockes
-    navigate("/login", { replace: true });
-  };
+  clearToken();
+  localStorage.removeItem("user");
+  navigate("/login", { replace: true });
+};
 
   return (
     <aside className="h-full bg-neutral-800 text-white flex flex-col overflow-hidden">
@@ -72,7 +73,7 @@ export default function Sidebar({ onNavigate }) {
         </div>
 
         <button
-          className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-md py-2 transition"
+          className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-red hover:text-white hover:bg-white/10 rounded-md py-2 transition"
           onClick={handleLogout}
         >
           <FiLogOut /> Déconnexion
