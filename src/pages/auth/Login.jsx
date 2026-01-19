@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// import { mockLogin } from "../../services/authMock";
 import { loginApi } from "../../services/authApi";
 
 export default function Login() {
@@ -29,12 +28,23 @@ export default function Login() {
         password: form.password,
         remember: form.remember,
       });
-      navigate("/dashboard");
 
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
+      // ✅ Récupère access/refresh depuis la réponse (cas le plus courant DRF)
+      const access = res?.data?.access || res?.data?.data?.access;
+      const refresh = res?.data?.refresh || res?.data?.data?.refresh;
+      const admin = res?.data?.admin || res?.data?.data?.admin;
+
+      if (!access) throw new Error("Token access manquant dans la réponse API.");
+
+      // ✅ Stockage tokens (JWT)
+      localStorage.setItem("access", access);
+      if (refresh) localStorage.setItem("refresh", refresh);
+
+      // Optionnel: garder aussi "token" = access si ton app l'utilise ailleurs
+      localStorage.setItem("token", access);
+
+      // Optionnel: stocker l'admin si présent
+      if (admin) localStorage.setItem("user", JSON.stringify(admin));
 
       setStatus({ type: "success", message: "Connecté !" });
       navigate("/dashboard");
@@ -107,8 +117,9 @@ export default function Login() {
               <button
                 type="submit"
                 className="w-full h-12 rounded-md bg-neutral-600 text-[#FFFFFF] text-[17px] font-semibold hover:bg-neutral-800 transition"
+                disabled={status.type === "loading"}
               >
-                Se connecter
+                {status.type === "loading" ? "Connexion..." : "Se connecter"}
               </button>
 
               {status.message && (
