@@ -5,7 +5,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 const API_RAW =
   import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
 
-// ✅ base propre (sans slash final, et sans /api si jamais)
+//  base propre (sans slash final, et sans /api si jamais)
 const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
 export default function HotelsList() {
@@ -16,7 +16,7 @@ export default function HotelsList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔍 Filtre
+  //  Filtre
   const [query, setQuery] = useState("");
 
   const fetchHotels = async () => {
@@ -39,7 +39,7 @@ export default function HotelsList() {
       const ct = res.headers.get("content-type") || "";
       const raw = await res.text();
 
-      // ✅ parse safe
+      //  parse safe
       const data = ct.includes("application/json")
         ? JSON.parse(raw || "null")
         : raw;
@@ -65,7 +65,7 @@ export default function HotelsList() {
     }
   };
 
-  // ✅ Recharge au montage + quand on revient de /new vers la liste
+  //  Recharge au montage + quand on revient de /new vers la liste
   useEffect(() => {
     fetchHotels();
     // eslint-disable-next-line

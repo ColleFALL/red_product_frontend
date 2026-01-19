@@ -9,6 +9,8 @@ export default function HotelCard({ hotel }) {
     (import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com")
       .replace(/\/+$/, "")
       .replace(/\/api\/?$/i, "");
+      console.log("PHOTO BACK:", hotel.photo);
+
 
   const photoUrl = hotel.photo
     ? (hotel.photo.startsWith("http") ? hotel.photo : `${BASE_URL}${hotel.photo}`)
