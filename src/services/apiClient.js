@@ -5,7 +5,6 @@ const BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 if (!BASE_URL) {
   // Ça aide à détecter un oubli de variable d'environnement
   console.log("API BASE URL =", import.meta.env.VITE_API_URL);
-
   console.log("BASE_URL =", BASE_URL);
 }
 
@@ -40,7 +39,10 @@ async function request(path, { method = "GET", body, isForm = false, auth = fals
     body: isForm ? body : body ? JSON.stringify(body) : undefined,
   });
 
-  const data = await res.json().catch(() => null);
+  const ct = res.headers.get("content-type") || "";
+const raw = await res.text();
+const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+
 
   if (!res.ok) {
     const message =
