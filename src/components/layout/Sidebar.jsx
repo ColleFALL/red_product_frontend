@@ -87,7 +87,7 @@ export default function Sidebar({ onNavigate }) {
             <div className="text-sm font-medium truncate">{userName}</div>
             <div
               className={`text-xs ${
-                isOnline ? "text-red-600" : "text-red-400"
+                isOnline ? "text-red-400" : "text-red-400"
               }`}
             >
               ● {isOnline ? "En ligne" : "Hors ligne"}
