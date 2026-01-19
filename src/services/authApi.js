@@ -14,7 +14,7 @@ export async function loginApi({ email, password, remember }) {
   if (!access) throw new Error("Token access manquant dans la réponse API.");
 
   setToken(access, refresh);
-  return res.data; // ✅ retourne directement les données
+  return data; // ✅ retourne directement les données
 }
 
 export async function registerApi({ name, email, password, accept }) {

@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL; 
+// const BASE_URL = import.meta.env.VITE_API_URL; 
+const BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+
 
 if (!BASE_URL) {
   // Ça aide à détecter un oubli de variable d'environnement
