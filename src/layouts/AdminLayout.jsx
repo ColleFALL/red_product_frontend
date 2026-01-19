@@ -1,16 +1,37 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
+import { meApi } from "../services/authApi";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
- 
+  useEffect(() => {
+    const loadMe = async () => {
+      try {
+        // ✅ Appel /api/auth/me (auth: true)
+        const res = await meApi(); // { success, message, data: admin }
+        const user = res?.data;
+
+        if (user) {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+      } catch (e) {
+        // Si token expiré / pas connecté => retour login
+        // (on reste simple, pas de refresh token ici)
+        navigate("/login", { replace: true });
+      }
+    };
+
+    loadMe();
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="flex min-h-screen">
-        {/* ✅ Sidebar desktop (plus de fixed) */}
+        {/* ✅ Sidebar desktop */}
         <div className="hidden md:block w-64 bg-neutral-800">
           <Sidebar />
         </div>
@@ -19,7 +40,6 @@ export default function AdminLayout() {
         <div className="flex-1 flex flex-col">
           <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-          {/* ✅ Outlet sans padding global (comme tu fais) */}
           <main className="flex-1">
             <Outlet />
           </main>
@@ -46,4 +66,3 @@ export default function AdminLayout() {
     </div>
   );
 }
-

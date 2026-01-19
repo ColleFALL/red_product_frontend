@@ -3,21 +3,19 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-
 import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import HotelsList from "./pages/hotels/HotelsList";
 import HotelCreate from "../src/pages/hotels/HotelCreate";
-// import HotelDetails from "./pages/hotels/HotelDetails";
-// import HotelEdit from "./pages/hotels/HotelEdit";
+
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
-   { path: "/login", element: <Login /> }, // ✅ AJOUT
+   { path: "/login", element: <Login /> }, //  AJOUT
   { path: "/register", element: <Register /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
 
-  // ✅ Layout dashboard + pages internes
+  //  Layout dashboard + pages internes
   {
     path: "/dashboard",
     element: <AdminLayout />,
@@ -27,20 +25,14 @@ export const router = createBrowserRouter([
       path: "hotels",
       element: <HotelsList />,
       children: [
-        { path: "new", element: <HotelCreate /> }, // ✅ modal
-      // { path: "hotels/:id", element: <HotelDetails /> },
-    // { path: "hotels/:id/edit", element: <HotelEdit /> },
+        { path: "new", element: <HotelCreate /> }, //  modal
+     
     ],
   
       }
     ]
   },
 
-  // ✅ compatibilité avec ton ancien chemin
-  // {
-  //   path: "/dashboard/dashboard",
-  //   element: <Navigate to="/dashboard" replace />,
-  // },
   { path: "hotels/create", element: <Navigate to="/dashboard/hotels/new" replace /> },
 
 ]);
