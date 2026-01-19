@@ -87,7 +87,7 @@ export default function Sidebar({ onNavigate }) {
             <div className="text-sm font-medium truncate">{userName}</div>
             <div
               className={`text-xs ${
-                isOnline ? "text-red-400" : "text-red-400"
+                isOnline ? "text-green-400" : "text-red-400"
               }`}
             >
               ● {isOnline ? "En ligne" : "Hors ligne"}
@@ -96,7 +96,7 @@ export default function Sidebar({ onNavigate }) {
         </div>
 
         <button
-          className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-md py-2 transition"
+          className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-red-400 hover:text-white hover:bg-white/10 rounded-md py-2 transition"
           onClick={handleLogout}
         >
           <FiLogOut /> Déconnexion
