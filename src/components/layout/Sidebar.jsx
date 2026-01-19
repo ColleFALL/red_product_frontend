@@ -20,6 +20,7 @@ export default function Sidebar({ onNavigate }) {
       return null;
     }
   }, []);
+  const isOnline = !!localStorage.getItem("access");
 
   const userName = user?.name || user?.email || "Utilisateur";
 
@@ -84,7 +85,13 @@ export default function Sidebar({ onNavigate }) {
           {/* ✅ Nom dynamique */}
           <div className="leading-tight min-w-0">
             <div className="text-sm font-medium truncate">{userName}</div>
-            <div className="text-xs text-green-400">● En ligne</div>
+            <div
+              className={`text-xs ${
+                isOnline ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              ● {isOnline ? "En ligne" : "Hors ligne"}
+            </div>
           </div>
         </div>
 
