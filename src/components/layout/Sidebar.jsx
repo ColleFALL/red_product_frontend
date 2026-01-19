@@ -12,7 +12,7 @@ export default function Sidebar({ onNavigate }) {
     navigate("/login", { replace: true });
   };
 
-  // ✅ Récupérer user depuis localStorage (rempli par AdminLayout via /api/auth/me)
+  //  Récupérer user depuis localStorage (rempli par AdminLayout via /api/auth/me)
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
@@ -77,17 +77,17 @@ export default function Sidebar({ onNavigate }) {
       {/* Footer fixe */}
       <div className="p-4 border-t border-white/10 shrink-0">
         <div className="flex items-center gap-3">
-          {/* ✅ Initiales dynamiques */}
+          {/*  Initiales dynamiques */}
           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm">
             {initials}
           </div>
 
-          {/* ✅ Nom dynamique */}
+          {/*  Nom dynamique */}
           <div className="leading-tight min-w-0">
             <div className="text-sm font-medium truncate">{userName}</div>
             <div
               className={`text-xs ${
-                isOnline ? "text-green-400" : "text-red-400"
+                isOnline ? "text-red-600" : "text-red-400"
               }`}
             >
               ● {isOnline ? "En ligne" : "Hors ligne"}
