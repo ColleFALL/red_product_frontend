@@ -8,18 +8,19 @@ export default function Topbar({ onMenuClick }) {
 
   const [uploading, setUploading] = useState(false);
 
-  const handleBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/dashboard");
-  };
-
-  const user = useMemo(() => {
+  // ✅ user local (mis à jour après upload)
+  const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
     } catch {
       return null;
     }
-  }, []);
+  });
+
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/dashboard");
+  };
 
   const userName = user?.name || user?.email || "Utilisateur";
 
@@ -31,20 +32,23 @@ export default function Topbar({ onMenuClick }) {
     return (first + last).toUpperCase();
   }, [userName]);
 
-  // ⚠️ nom de champ avatar possible (à ajuster quand on voit ton backend)
-  const avatar = user?.photo || user?.avatar || "";
+  // ✅ photo vient bien de user.photo (backend)
+  const avatar = user?.photo || "";
 
-  const BASE_URL = (import.meta.env.VITE_API_URL || "")
+  // ✅ base URL robuste
+  const BASE_URL = (import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com")
     .replace(/\/+$/, "")
     .replace(/\/api\/?$/i, "");
 
   const avatarUrl = avatar
     ? avatar.startsWith("http")
       ? avatar
-      : `${BASE_URL}${avatar}`
+      : `${BASE_URL}${avatar}` // ex: /media/admins/xxx.jpg
     : "";
 
-  const onPick = () => fileRef.current?.click();
+  const onPick = () => {
+    if (!uploading) fileRef.current?.click();
+  };
 
   const onFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -52,11 +56,12 @@ export default function Topbar({ onMenuClick }) {
 
     try {
       setUploading(true);
+
       const token = localStorage.getItem("access");
       if (!token) throw new Error("Non connecté.");
 
       const fd = new FormData();
-      fd.append("photo", file); // ✅ champ file
+      fd.append("photo", file); // ✅ champ backend: request.FILES["photo"]
 
       const res = await fetch(`${BASE_URL}/api/auth/avatar`, {
         method: "POST",
@@ -76,19 +81,18 @@ export default function Topbar({ onMenuClick }) {
         throw new Error(msg);
       }
 
-      // attendu: { success, message, data: user }
+      // ✅ attendu: { success, message, data: user }
       const updatedUser = data?.data;
-      if (updatedUser) localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      // refresh visuel simple
-      window.location.reload();
+      if (updatedUser) {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser); // ✅ update UI instant, sans reload
+      }
     } catch (err) {
       console.error(err);
       alert(err.message || "Erreur upload photo");
     } finally {
       setUploading(false);
-      // permet de re-uploader le même fichier
-      e.target.value = "";
+      e.target.value = ""; // permet de re-uploader le même fichier
     }
   };
 
@@ -121,7 +125,6 @@ export default function Topbar({ onMenuClick }) {
           <FiBell />
         </button>
 
-        {/* ✅ input file hidden */}
         <input
           ref={fileRef}
           type="file"
@@ -130,11 +133,12 @@ export default function Topbar({ onMenuClick }) {
           onChange={onFileChange}
         />
 
-        {/* ✅ avatar clickable */}
         <button
           type="button"
           onClick={onPick}
-          className="w-9 h-9 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center text-sm font-medium"
+          className={`w-9 h-9 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center text-sm font-medium ${
+            uploading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+          }`}
           aria-label="Changer photo de profil"
           title={uploading ? "Upload..." : userName}
           disabled={uploading}
