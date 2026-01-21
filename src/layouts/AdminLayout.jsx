@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 import { meApi } from "../services/authApi";
+import { SearchProvider } from "../context/SearchContext";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function AdminLayout() {
   }, [navigate]);
 
   return (
+       <SearchProvider>
     <div className="min-h-screen bg-neutral-100">
       <div className="flex min-h-screen">
         {/* ✅ Sidebar desktop */}
@@ -64,5 +66,6 @@ export default function AdminLayout() {
         <Sidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
     </div>
+    </SearchProvider>
   );
 }
