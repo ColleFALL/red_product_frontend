@@ -29,20 +29,20 @@ export default function AdminLayout() {
     loadMe();
   }, [navigate]);
 
-  return (
-       <SearchProvider>
-    <div className="min-h-screen bg-neutral-100">
-      <div className="flex min-h-screen">
+ return (
+  <SearchProvider>
+    <div className="h-screen bg-neutral-100">
+      <div className="flex h-screen">
         {/* ✅ Sidebar desktop */}
-        <div className="hidden md:block w-64 bg-neutral-800">
+        <div className="hidden md:block w-64 shrink-0">
           <Sidebar />
         </div>
 
         {/* ✅ Contenu */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-          <main className="flex-1">
+          <main className="flex-1 min-h-0 overflow-y-auto px-4 py-4">
             <Outlet />
           </main>
         </div>
@@ -51,6 +51,7 @@ export default function AdminLayout() {
       {/* ✅ Overlay mobile */}
       {sidebarOpen && (
         <button
+          type="button"
           className="md:hidden fixed inset-0 bg-black/40 z-40"
           onClick={() => setSidebarOpen(false)}
           aria-label="Fermer le menu"
@@ -59,13 +60,14 @@ export default function AdminLayout() {
 
       {/* ✅ Sidebar mobile drawer */}
       <div
-        className={`md:hidden fixed inset-y-0 left-0 w-72 bg-neutral-800 z-50 transform transition-transform duration-200 ${
+        className={`md:hidden fixed inset-y-0 left-0 w-72 z-50 transform transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <Sidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
     </div>
-    </SearchProvider>
-  );
+  </SearchProvider>
+);
+
 }
