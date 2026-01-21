@@ -1,8 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FiX, FiMapPin, FiMail, FiPhone, FiTrash2, FiEdit3 } from "react-icons/fi";
+import {
+  FiX,
+  FiMapPin,
+  FiMail,
+  FiPhone,
+  FiTrash2,
+  FiEdit3,
+} from "react-icons/fi";
 
 const API_RAW =
-  import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
+  import.meta.env.VITE_API_URL ||
+  "https://red-product-backend-eymz.onrender.com";
 const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
 export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
@@ -14,7 +22,9 @@ export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
 
   const photoUrl = useMemo(() => {
     if (!hotel?.photo) return "";
-    return hotel.photo.startsWith("http") ? hotel.photo : `${BASE_URL}${hotel.photo}`;
+    return hotel.photo.startsWith("http")
+      ? hotel.photo
+      : `${BASE_URL}${hotel.photo}`;
   }, [hotel, BASE_URL]);
 
   const fallback =
@@ -40,13 +50,17 @@ export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
 
         const ct = res.headers.get("content-type") || "";
         const raw = await res.text();
-        const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+        const data = ct.includes("application/json")
+          ? JSON.parse(raw || "null")
+          : raw;
 
         if (!res.ok) {
           const msg =
             typeof data === "string"
               ? data.slice(0, 200)
-              : data?.detail || data?.message || JSON.stringify(data).slice(0, 200);
+              : data?.detail ||
+                data?.message ||
+                JSON.stringify(data).slice(0, 200);
           throw new Error(`Erreur API (${res.status}) : ${msg}`);
         }
 
@@ -63,7 +77,9 @@ export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
   }, [id]);
 
   const onDelete = async () => {
-    const ok = window.confirm("Supprimer cet hôtel ? Cette action est irréversible.");
+    const ok = window.confirm(
+      "Supprimer cet hôtel ? Cette action est irréversible."
+    );
     if (!ok) return;
 
     try {
@@ -77,7 +93,9 @@ export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
 
       if (!res.ok) {
         const raw = await res.text();
-        throw new Error(raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`);
+        throw new Error(
+          raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`
+        );
       }
 
       onDeleted?.();
@@ -167,10 +185,13 @@ export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
                 <div className="mt-6 flex gap-2">
                   <button
                     type="button"
-                    onClick={() => onEdit?.(hotel.id)}
+                    onClick={() => {
+                      onClose?.();
+                      navigate(`/dashboard/hotels/${id}/edit`);
+                    }}
                     className="h-10 px-4 rounded-lg bg-neutral-800 text-white text-sm hover:bg-neutral-900 transition flex items-center gap-2"
                   >
-                    <FiEdit3 /> Modifier
+                    Modifier
                   </button>
 
                   <button
