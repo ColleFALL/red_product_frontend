@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
 
-
-export default function Topbar({ onMenuClick }) {
+export default function Topbar({ onMenuClick = () => {} }) {
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const { search, setSearch } = useSearch();
@@ -104,6 +103,7 @@ export default function Topbar({ onMenuClick }) {
     <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-4 md:px-6">
       <div className="flex items-center gap-3 shrink-0">
         <button
+          type="button"
           className="md:hidden p-2 rounded-md hover:bg-neutral-100"
           onClick={onMenuClick}
           aria-label="Ouvrir le menu"
@@ -155,6 +155,7 @@ export default function Topbar({ onMenuClick }) {
         </button>
 
         <button
+          type="button"
           className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
           onClick={handleBack}
           aria-label="Retour"
