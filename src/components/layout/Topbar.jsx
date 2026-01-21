@@ -1,14 +1,16 @@
-
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
 
-export default function Topbar({ onMenuClick }) {
+export default function Topbar(props) {
+  // ✅ SÉCURITÉ ABSOLUE : même si rien n’est passé depuis le layout
+  const onMenuClick = props?.onMenuClick || (() => {});
+
   const navigate = useNavigate();
   const fileRef = useRef(null);
 
-  //  Recherche globale
+  /* 🔎 Recherche globale */
   const { search, setSearch } = useSearch();
   const [local, setLocal] = useState(search || "");
 
@@ -17,7 +19,7 @@ export default function Topbar({ onMenuClick }) {
     setLocal(search || "");
   }, [search]);
 
-  // ⏱️ debounce léger
+  // debounce léger
   useEffect(() => {
     const t = setTimeout(() => setSearch(local), 200);
     return () => clearTimeout(t);
@@ -25,7 +27,7 @@ export default function Topbar({ onMenuClick }) {
 
   const [uploading, setUploading] = useState(false);
 
-  // 👤 user local
+  /* 👤 Utilisateur */
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
@@ -51,7 +53,8 @@ export default function Topbar({ onMenuClick }) {
 
   const avatar = user?.photo || "";
 
-  const BASE_URL = (import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com")
+  const BASE_URL = (import.meta.env.VITE_API_URL ||
+    "https://red-product-backend-eymz.onrender.com")
     .replace(/\/+$/, "")
     .replace(/\/api\/?$/i, "");
 
@@ -71,7 +74,6 @@ export default function Topbar({ onMenuClick }) {
 
     try {
       setUploading(true);
-
       const token = localStorage.getItem("access");
       if (!token) throw new Error("Non connecté.");
 
@@ -86,7 +88,9 @@ export default function Topbar({ onMenuClick }) {
 
       const ct = res.headers.get("content-type") || "";
       const raw = await res.text();
-      const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+      const data = ct.includes("application/json")
+        ? JSON.parse(raw || "null")
+        : raw;
 
       if (!res.ok) {
         const msg =
@@ -112,8 +116,10 @@ export default function Topbar({ onMenuClick }) {
 
   return (
     <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-4 md:px-6">
+      {/* GAUCHE */}
       <div className="flex items-center gap-3 shrink-0">
         <button
+          type="button"
           className="md:hidden p-2 rounded-md hover:bg-neutral-100"
           onClick={onMenuClick}
           aria-label="Ouvrir le menu"
@@ -121,23 +127,34 @@ export default function Topbar({ onMenuClick }) {
           <FiMenu />
         </button>
 
-        <div className="text-sm text-neutral-500 hidden sm:block">Dashboard</div>
-      </div>
-
-      <div className="hidden sm:flex flex-1 justify-center px-3">
-        <div className="relative w-full max-w-xl">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
-          <input
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-            placeholder="Recherche"
-            className="w-full h-10 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
-          />
+        <div className="text-sm text-neutral-500 hidden sm:block">
+          Dashboard
         </div>
       </div>
 
+      {/* ESPACE */}
+      <div className="flex-1" />
+
+      {/* DROITE */}
       <div className="flex items-center gap-3 shrink-0">
-        <button className="p-2 rounded-full hover:bg-neutral-100" aria-label="Notifications">
+        {/* 🔎 Recherche */}
+        <div className="hidden sm:block">
+          <div className="relative w-52 md:w-60">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
+            <input
+              value={local}
+              onChange={(e) => setLocal(e.target.value)}
+              placeholder="Recherche"
+              className="w-full h-9 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="p-2 rounded-full hover:bg-neutral-100"
+          aria-label="Notifications"
+        >
           <FiBell />
         </button>
 
@@ -160,13 +177,18 @@ export default function Topbar({ onMenuClick }) {
           disabled={uploading}
         >
           {avatarUrl ? (
-            <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+            <img
+              src={avatarUrl}
+              alt={userName}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <span>{initials}</span>
           )}
         </button>
 
         <button
+          type="button"
           className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
           onClick={handleBack}
           aria-label="Retour"
