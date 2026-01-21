@@ -113,7 +113,7 @@ export default function HotelCreate() {
       />
 
       {/* modal */}
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="absolute inset-0 flex items-center justify-center p-4 mt-5">
         <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-xl shadow-lg overflow-hidden">
           {/* header */}
           <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
@@ -247,14 +247,14 @@ export default function HotelCreate() {
               <button
                 type="button"
                 onClick={close}
-                className="h-11 px-6 rounded-lg border border-neutral-200 text-sm hover:bg-neutral-50"
+                className="h-11 px-6 rounded-lg border border-neutral-200 bg-neutral-800 text-white text-sm hover:bg-neutral-800 transition"
               >
                 Annuler
               </button>
 
               <button
                 type="submit"
-                className="h-11 px-7 rounded-lg bg-black text-orange-600 text-sm hover:bg-neutral-800 transition"
+                className="h-11 px-7 rounded-lg bg-neutral-800 text-white text-sm hover:bg-neutral-800 transition"
               >
                 Enregistrer
               </button>
