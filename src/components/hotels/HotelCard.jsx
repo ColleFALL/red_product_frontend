@@ -57,7 +57,7 @@ import React from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-export default function HotelCard({ hotel }) {
+export default function HotelCard({ hotel, onOpen }) {
   const navigate = useNavigate();
 
   const formatPrice = (n, devise = "XOF") =>
@@ -69,20 +69,28 @@ export default function HotelCard({ hotel }) {
       .replace(/\/api\/?$/i, "");
 
   const photoUrl = hotel.photo
-    ? (hotel.photo.startsWith("http") ? hotel.photo : `${BASE_URL}${hotel.photo}`)
+    ? hotel.photo.startsWith("http")
+      ? hotel.photo
+      : `${BASE_URL}${hotel.photo}`
     : "";
 
   const fallback =
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=60";
 
+  const open = () => {
+    if (onOpen) onOpen(hotel.id); // ✅ ouvre modal depuis HotelsList
+    else navigate(`/dashboard/hotels/${hotel.id}`); // ✅ fallback page détails
+  };
+
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={() => navigate(`/dashboard/hotels/${hotel.id}`)}
+      onClick={open}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          navigate(`/dashboard/hotels/${hotel.id}`);
+          e.preventDefault();
+          open();
         }
       }}
       className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer"
@@ -120,4 +128,5 @@ export default function HotelCard({ hotel }) {
     </div>
   );
 }
+
 
