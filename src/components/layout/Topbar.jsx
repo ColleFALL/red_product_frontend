@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
@@ -6,8 +6,21 @@ import { useSearch } from "../../context/SearchContext";
 export default function Topbar({ onMenuClick = () => {} }) {
   const navigate = useNavigate();
   const fileRef = useRef(null);
+
+  // 🔎 Recherche globale
   const { search, setSearch } = useSearch();
-  const [local, setLocal] = useState(search);
+  const [local, setLocal] = useState(search || "");
+
+  // ✅ si search change ailleurs, on sync l’input
+  useEffect(() => {
+    setLocal(search || "");
+  }, [search]);
+
+  // ✅ debounce léger : met à jour le search global
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(local), 200);
+    return () => clearTimeout(t);
+  }, [local, setSearch]);
 
   const [uploading, setUploading] = useState(false);
 
@@ -46,7 +59,7 @@ export default function Topbar({ onMenuClick = () => {} }) {
   const avatarUrl = avatar
     ? avatar.startsWith("http")
       ? avatar
-      : `${BASE_URL}${avatar}` // ex: /media/admins/xxx.jpg
+      : `${BASE_URL}${avatar}`
     : "";
 
   const onPick = () => {
@@ -64,7 +77,7 @@ export default function Topbar({ onMenuClick = () => {} }) {
       if (!token) throw new Error("Non connecté.");
 
       const fd = new FormData();
-      fd.append("photo", file); // ✅ champ backend: request.FILES["photo"]
+      fd.append("photo", file);
 
       const res = await fetch(`${BASE_URL}/api/auth/avatar`, {
         method: "POST",
@@ -84,18 +97,17 @@ export default function Topbar({ onMenuClick = () => {} }) {
         throw new Error(msg);
       }
 
-      // ✅ attendu: { success, message, data: user }
       const updatedUser = data?.data;
       if (updatedUser) {
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUser(updatedUser); // ✅ update UI instant, sans reload
+        setUser(updatedUser);
       }
     } catch (err) {
       console.error(err);
       alert(err.message || "Erreur upload photo");
     } finally {
       setUploading(false);
-      e.target.value = ""; // permet de re-uploader le même fichier
+      e.target.value = "";
     }
   };
 
@@ -115,11 +127,13 @@ export default function Topbar({ onMenuClick = () => {} }) {
       </div>
 
       <div className="hidden sm:flex flex-1 justify-center px-3">
-        <div className="relative w-full max-w-xl">
+        <div className="relative w-52 md:w-60">
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
           <input
+            value={local}
+            onChange={(e) => setLocal(e.target.value)}
             placeholder="Recherche"
-            className="w-full h-10 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
+            className="w-full h-9 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
           />
         </div>
       </div>
