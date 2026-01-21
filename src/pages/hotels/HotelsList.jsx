@@ -123,7 +123,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import HotelCard from "../../components/hotels/HotelCard";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { useSearch } from "../../context/SearchContext";
-import HotelDetailsModal from "./HotelDetailsModal"; // AJOUT
+import HotelDetailsModal from "./HotelDetailsModal";
 
 const API_RAW =
   import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
@@ -139,7 +139,6 @@ export default function HotelsList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  //  modal détails
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchHotels = async () => {
@@ -182,6 +181,11 @@ export default function HotelsList() {
     // eslint-disable-next-line
   }, [location.pathname]);
 
+  // ✅ IMPORTANT: fermer le modal dès qu’on change d’URL (ex: /:id/edit)
+  useEffect(() => {
+    setSelectedId(null);
+  }, [location.pathname]);
+
   const filteredHotels = useMemo(() => {
     const q = (search || "").trim().toLowerCase();
     if (!q) return hotels;
@@ -220,28 +224,26 @@ export default function HotelsList() {
           </button>
         </div>
       </div>
+
       <div className="px-6 py-5">
         <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
           {filteredHotels.map((hotel) => (
-            <HotelCard
-              key={hotel.id}
-              hotel={hotel}
-              onOpen={setSelectedId} //  ouvre modal
-            />
+            <HotelCard key={hotel.id} hotel={hotel} onOpen={setSelectedId} />
           ))}
         </div>
       </div>
-      {/*  Modal détails (depuis la liste) */}
+
       {selectedId && (
         <HotelDetailsModal
           id={selectedId}
           onClose={() => setSelectedId(null)}
           onDeleted={() => {
             setSelectedId(null);
-            fetchHotels(); // refresh après suppression
+            fetchHotels();
           }}
         />
       )}
+
       <Outlet />
     </div>
   );
