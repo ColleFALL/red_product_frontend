@@ -1,33 +1,18 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
-import { useSearch } from "../../context/SearchContext";
+import { useSearch } from "../context/SearchContext";
 
-export default function Topbar(props) {
-  // ✅ SÉCURITÉ ABSOLUE : même si rien n’est passé depuis le layout
-  const onMenuClick = props?.onMenuClick || (() => {});
 
+export default function Topbar({ onMenuClick }) {
   const navigate = useNavigate();
   const fileRef = useRef(null);
-
-  /* 🔎 Recherche globale */
   const { search, setSearch } = useSearch();
-  const [local, setLocal] = useState(search || "");
-
-  // sync si search change ailleurs
-  useEffect(() => {
-    setLocal(search || "");
-  }, [search]);
-
-  // debounce léger
-  useEffect(() => {
-    const t = setTimeout(() => setSearch(local), 200);
-    return () => clearTimeout(t);
-  }, [local, setSearch]);
+  const [local, setLocal] = useState(search);
 
   const [uploading, setUploading] = useState(false);
 
-  /* 👤 Utilisateur */
+  // ✅ user local (mis à jour après upload)
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
@@ -51,17 +36,18 @@ export default function Topbar(props) {
     return (first + last).toUpperCase();
   }, [userName]);
 
+  // ✅ photo vient bien de user.photo (backend)
   const avatar = user?.photo || "";
 
-  const BASE_URL = (import.meta.env.VITE_API_URL ||
-    "https://red-product-backend-eymz.onrender.com")
+  // ✅ base URL robuste
+  const BASE_URL = (import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com")
     .replace(/\/+$/, "")
     .replace(/\/api\/?$/i, "");
 
   const avatarUrl = avatar
     ? avatar.startsWith("http")
       ? avatar
-      : `${BASE_URL}${avatar}`
+      : `${BASE_URL}${avatar}` // ex: /media/admins/xxx.jpg
     : "";
 
   const onPick = () => {
@@ -74,13 +60,14 @@ export default function Topbar(props) {
 
     try {
       setUploading(true);
+
       const token = localStorage.getItem("access");
       if (!token) throw new Error("Non connecté.");
 
       const fd = new FormData();
-      fd.append("photo", file);
+      fd.append("photo", file); // ✅ champ backend: request.FILES["photo"]
 
-      const res = await fetch(`${BASE_URL}/api/auth/avatar/`, {
+      const res = await fetch(`${BASE_URL}/api/auth/avatar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -88,9 +75,7 @@ export default function Topbar(props) {
 
       const ct = res.headers.get("content-type") || "";
       const raw = await res.text();
-      const data = ct.includes("application/json")
-        ? JSON.parse(raw || "null")
-        : raw;
+      const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
 
       if (!res.ok) {
         const msg =
@@ -100,26 +85,25 @@ export default function Topbar(props) {
         throw new Error(msg);
       }
 
+      // ✅ attendu: { success, message, data: user }
       const updatedUser = data?.data;
       if (updatedUser) {
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUser(updatedUser);
+        setUser(updatedUser); // ✅ update UI instant, sans reload
       }
     } catch (err) {
       console.error(err);
       alert(err.message || "Erreur upload photo");
     } finally {
       setUploading(false);
-      e.target.value = "";
+      e.target.value = ""; // permet de re-uploader le même fichier
     }
   };
 
   return (
     <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-4 md:px-6">
-      {/* GAUCHE */}
       <div className="flex items-center gap-3 shrink-0">
         <button
-          type="button"
           className="md:hidden p-2 rounded-md hover:bg-neutral-100"
           onClick={onMenuClick}
           aria-label="Ouvrir le menu"
@@ -127,34 +111,21 @@ export default function Topbar(props) {
           <FiMenu />
         </button>
 
-        <div className="text-sm text-neutral-500 hidden sm:block">
-          Dashboard
+        <div className="text-sm text-neutral-500 hidden sm:block">Dashboard</div>
+      </div>
+
+      <div className="hidden sm:flex flex-1 justify-center px-3">
+        <div className="relative w-full max-w-xl">
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
+          <input
+            placeholder="Recherche"
+            className="w-full h-10 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
+          />
         </div>
       </div>
 
-      {/* ESPACE */}
-      <div className="flex-1" />
-
-      {/* DROITE */}
       <div className="flex items-center gap-3 shrink-0">
-        {/* 🔎 Recherche */}
-        <div className="hidden sm:block">
-          <div className="relative w-52 md:w-60">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
-            <input
-              value={local}
-              onChange={(e) => setLocal(e.target.value)}
-              placeholder="Recherche"
-              className="w-full h-9 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
-            />
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="p-2 rounded-full hover:bg-neutral-100"
-          aria-label="Notifications"
-        >
+        <button className="p-2 rounded-full hover:bg-neutral-100" aria-label="Notifications">
           <FiBell />
         </button>
 
@@ -177,18 +148,13 @@ export default function Topbar(props) {
           disabled={uploading}
         >
           {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={userName}
-              className="w-full h-full object-cover"
-            />
+            <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
           ) : (
             <span>{initials}</span>
           )}
         </button>
 
         <button
-          type="button"
           className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
           onClick={handleBack}
           aria-label="Retour"
