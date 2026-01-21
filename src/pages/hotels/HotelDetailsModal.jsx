@@ -323,7 +323,7 @@ export default function HotelDetailsModal({ id, onClose, onDeleted }) {
       />
 
       {/* modal */}
-      <div className="absolute inset-0 flex items-center justify-end p-4">
+      <div className="absolute inset-0 flex items-center justify-center p-4">
         <div className="w-full max-w-4xl bg-white rounded-2xl border border-neutral-200 shadow-xl overflow-hidden md:ml-6">
           {/* header */}
           <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
