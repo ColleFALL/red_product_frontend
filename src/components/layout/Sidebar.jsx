@@ -33,78 +33,82 @@ export default function Sidebar({ onNavigate }) {
   }, [userName]);
 
 return (
-  <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-4 md:px-6">
-    {/* Gauche */}
-    <div className="flex items-center gap-3 shrink-0">
-      <button
-        className="md:hidden p-2 rounded-md hover:bg-neutral-100"
-        onClick={onMenuClick}
-        aria-label="Ouvrir le menu"
-      >
-        <FiMenu />
-      </button>
+  <aside className="relative sidebar-bg text-white overflow-hidden flex flex-col h-screen">
+    {/* Background overlay comme login */}
+    <div className="absolute inset-0 bg-black/70" />
 
-      <div className="text-sm text-neutral-500 hidden sm:block">Dashboard</div>
-    </div>
-
-    {/* Spacer (au lieu de centrer la recherche) */}
-    <div className="flex-1" />
-
-    {/* Droite */}
-    <div className="flex items-center gap-3 shrink-0">
-      {/* 🔎 Recherche rapprochée de la notif */}
-      <div className="hidden sm:block">
-        <div className="relative w-52 md:w-60">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
-          <input
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-            placeholder="Recherche"
-            className="w-full h-9 pl-10 pr-3 rounded-full bg-gray-50 outline-none focus:ring-2 focus:ring-neutral-200 text-sm"
-          />
+    {/* Contenu au-dessus */}
+    <div className="relative z-10 flex flex-col h-full">
+      {/* Header fixe */}
+      <div className="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+        <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
+          <div className="w-3 h-3 bg-white rotate-45" />
         </div>
+        <div className="font-semibold tracking-wider">RED PRODUCT</div>
       </div>
 
-      <button className="p-2 rounded-full hover:bg-neutral-100" aria-label="Notifications">
-        <FiBell />
-      </button>
+      {/* Zone scrollable */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="px-4 pt-4 pb-2 text-xs text-white">Principal</div>
 
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={onFileChange}
-      />
+        <nav className="px-0 space-y-1">
+          <NavLink
+            to="/dashboard"
+            end
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-2 text-sm transition
+              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80"}`
+            }
+          >
+            <FiGrid />
+            Dashboard
+          </NavLink>
 
-      <button
-        type="button"
-        onClick={onPick}
-        className={`w-9 h-9 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center text-sm font-medium ${
-          uploading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-        }`}
-        aria-label="Changer photo de profil"
-        title={uploading ? "Upload..." : userName}
-        disabled={uploading}
-      >
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
-        ) : (
-          <span>{initials}</span>
-        )}
-      </button>
+          <NavLink
+            to="/dashboard/hotels"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `w-full flex items-center gap-3 px-4 py-2 text-sm transition
+              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80"}`
+            }
+          >
+            <FiHome />
+            Liste des hôtels
+          </NavLink>
+        </nav>
+      </div>
 
-      <button
-        className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
-        onClick={handleBack}
-        aria-label="Retour"
-        title="Retour"
-      >
-        <FiArrowRight />
-      </button>
+      {/* Footer fixe */}
+      <div className="p-4 border-t border-white/10 shrink-0">
+        <div className="flex items-center gap-3">
+          {/* Initiales dynamiques */}
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm">
+            {initials}
+          </div>
+
+          {/* Nom dynamique */}
+          <div className="leading-tight min-w-0">
+            <div className="text-sm font-medium truncate">{userName}</div>
+            <div
+              className={`text-xs ${
+                isOnline ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              ● {isOnline ? "En ligne" : "Hors ligne"}
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-red-400 hover:text-white hover:bg-white/10 rounded-md py-2 transition"
+          onClick={handleLogout}
+        >
+          <FiLogOut /> Déconnexion
+        </button>
+      </div>
     </div>
-  </header>
+  </aside>
 );
-
 
 }
