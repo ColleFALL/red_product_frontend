@@ -34,6 +34,7 @@ async function request(path, { method = "GET", body, isForm = false, auth = fals
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {
+    
     method,
     headers,
     body: isForm ? body : body ? JSON.stringify(body) : undefined,

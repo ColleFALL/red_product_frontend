@@ -2,7 +2,7 @@ import { api, setToken } from "./apiClient";
 
 export async function loginApi({ email, password, remember }) {
   const data = await api.post(
-    "/api/auth/login",
+    "/api/auth/login/",
     { email, password, remember },
     { auth: false }
   );
@@ -18,17 +18,17 @@ export async function loginApi({ email, password, remember }) {
 }
 
 export async function registerApi({ name, email, password, accept }) {
-  return api.post("/api/auth/register", { name, email, password, accept }, { auth: false });
+  return api.post("/api/auth/register/", { name, email, password, accept }, { auth: false });
 }
 
 export async function forgotPasswordApi(email) {
-  return api.post("/api/auth/forgot-password", { email }, { auth: false });
+  return api.post("/api/auth/forgot-password/", { email }, { auth: false });
 }
 
 export async function resetPasswordApi(payload) {
-  return api.post("/api/auth/reset-password", payload, { auth: false });
+  return api.post("/api/auth/reset-password/", payload, { auth: false });
 }
 
 export async function meApi() {
-  return api.get("/api/auth/me", { auth: true });
+  return api.get("/api/auth/me/", { auth: true });
 }
