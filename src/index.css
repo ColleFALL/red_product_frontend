@@ -11,3 +11,10 @@ body {
   background-size: cover;
   background-attachment: fixed; /* optionnel */
 }
+/* Fond sidebar */
+.sidebar-bg {
+  background-image: url("./assets/images/image-fond.jpeg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}

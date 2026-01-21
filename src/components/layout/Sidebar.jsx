@@ -32,8 +32,13 @@ export default function Sidebar({ onNavigate }) {
     return (first + last).toUpperCase();
   }, [userName]);
 
-  return (
-    <aside className="h-full bg-neutral-800 text-white flex flex-col overflow-hidden">
+return (
+  <aside className="relative sidebar-bg text-white overflow-hidden flex flex-col h-screen">
+    {/* Background overlay comme login */}
+    <div className="absolute inset-0 bg-black/70" />
+
+    {/* Contenu au-dessus */}
+    <div className="relative z-10 flex flex-col h-full">
       {/* Header fixe */}
       <div className="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
         <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
@@ -77,12 +82,12 @@ export default function Sidebar({ onNavigate }) {
       {/* Footer fixe */}
       <div className="p-4 border-t border-white/10 shrink-0">
         <div className="flex items-center gap-3">
-          {/*  Initiales dynamiques */}
+          {/* Initiales dynamiques */}
           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm">
             {initials}
           </div>
 
-          {/*  Nom dynamique */}
+          {/* Nom dynamique */}
           <div className="leading-tight min-w-0">
             <div className="text-sm font-medium truncate">{userName}</div>
             <div
@@ -102,6 +107,8 @@ export default function Sidebar({ onNavigate }) {
           <FiLogOut /> Déconnexion
         </button>
       </div>
-    </aside>
-  );
+    </div>
+  </aside>
+);
+
 }
