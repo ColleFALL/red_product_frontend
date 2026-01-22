@@ -87,10 +87,11 @@ export default function HotelCard({ hotel, onOpen }) {
     new Intl.NumberFormat("fr-FR").format(n) + " " + devise;
 
   // ✅ Cloudinary: URL directe renvoyée par l'API
-  const photoUrl = hotel?.photo_url || (typeof hotel?.photo === "string" && hotel.photo.startsWith("http") ? hotel.photo : "");
+  const photoUrl =
+   hotel?.photo_url || (typeof hotel?.photo === "string" && hotel.photo.startsWith("http") ? hotel.photo : "");
 
-  // const fallback =
-  //   "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=60";
+   const fallback =
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=60";
 
   const open = () => {
     if (onOpen) onOpen(hotel.id); // ouvre modal depuis HotelsList
