@@ -210,6 +210,9 @@ const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
 export default function HotelDetailsModal({ id, onClose, onDeleted }) {
   const navigate = useNavigate();
+  console.log({
+    hotel
+  })
 
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(false);
