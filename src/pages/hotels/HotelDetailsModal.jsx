@@ -1,19 +1,16 @@
+
+
 // import React, { useEffect, useMemo, useState } from "react";
-// import {
-//   FiX,
-//   FiMapPin,
-//   FiMail,
-//   FiPhone,
-//   FiTrash2,
-//   FiEdit3,
-// } from "react-icons/fi";
+// import { useNavigate } from "react-router-dom";
+// import { FiX, FiMapPin, FiMail, FiPhone, FiTrash2, FiEdit3 } from "react-icons/fi";
 
 // const API_RAW =
-//   import.meta.env.VITE_API_URL ||
-//   "https://red-product-backend-eymz.onrender.com";
+//   import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
 // const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
-// export default function HotelDetailsModal({ id, onClose, onDeleted, onEdit }) {
+// export default function HotelDetailsModal({ id, onClose, onDeleted }) {
+//   const navigate = useNavigate(); // ✅ IMPORTANT
+
 //   const [hotel, setHotel] = useState(null);
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState("");
@@ -22,9 +19,7 @@
 
 //   const photoUrl = useMemo(() => {
 //     if (!hotel?.photo) return "";
-//     return hotel.photo.startsWith("http")
-//       ? hotel.photo
-//       : `${BASE_URL}${hotel.photo}`;
+//     return hotel.photo.startsWith("http") ? hotel.photo : `${BASE_URL}${hotel.photo}`;
 //   }, [hotel, BASE_URL]);
 
 //   const fallback =
@@ -50,17 +45,13 @@
 
 //         const ct = res.headers.get("content-type") || "";
 //         const raw = await res.text();
-//         const data = ct.includes("application/json")
-//           ? JSON.parse(raw || "null")
-//           : raw;
+//         const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
 
 //         if (!res.ok) {
 //           const msg =
 //             typeof data === "string"
 //               ? data.slice(0, 200)
-//               : data?.detail ||
-//                 data?.message ||
-//                 JSON.stringify(data).slice(0, 200);
+//               : data?.detail || data?.message || JSON.stringify(data).slice(0, 200);
 //           throw new Error(`Erreur API (${res.status}) : ${msg}`);
 //         }
 
@@ -77,9 +68,7 @@
 //   }, [id]);
 
 //   const onDelete = async () => {
-//     const ok = window.confirm(
-//       "Supprimer cet hôtel ? Cette action est irréversible."
-//     );
+//     const ok = window.confirm("Supprimer cet hôtel ? Cette action est irréversible.");
 //     if (!ok) return;
 
 //     try {
@@ -93,15 +82,19 @@
 
 //       if (!res.ok) {
 //         const raw = await res.text();
-//         throw new Error(
-//           raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`
-//         );
+//         throw new Error(raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`);
 //       }
 
 //       onDeleted?.();
 //     } catch (e) {
 //       alert(e.message || "Erreur suppression");
 //     }
+//   };
+
+//   const goEdit = () => {
+//     // ✅ IMPORTANT: fermer le modal puis naviguer vers la route enfant
+//     onClose?.();
+//     navigate(`${id}/edit`);
 //   };
 
 //   return (
@@ -116,7 +109,7 @@
 
 //       {/* modal */}
 //       <div className="absolute inset-0 flex items-center justify-center p-4">
-//         <div className="w-full max-w-4xl bg-white rounded-2xl border border-neutral-200 shadow-xl overflow-hidden">
+//         <div className="w-full max-w-4xl bg-white rounded-2xl border border-neutral-200 shadow-xl overflow-hidden md:ml-6">
 //           {/* header */}
 //           <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
 //             <div className="text-sm font-semibold text-neutral-800 tracking-wide">
@@ -132,7 +125,6 @@
 //             </button>
 //           </div>
 
-//           {/* content */}
 //           {loading ? (
 //             <div className="p-6 text-sm text-neutral-600">Chargement…</div>
 //           ) : error ? (
@@ -153,9 +145,7 @@
 
 //               {/* infos */}
 //               <div className="p-6">
-//                 <div className="text-xl font-semibold text-neutral-900">
-//                   {hotel.nom}
-//                 </div>
+//                 <div className="text-xl font-semibold text-neutral-900">{hotel.nom}</div>
 
 //                 <div className="mt-2 flex items-start gap-2 text-sm text-neutral-600">
 //                   <FiMapPin className="mt-0.5 shrink-0" />
@@ -185,13 +175,10 @@
 //                 <div className="mt-6 flex gap-2">
 //                   <button
 //                     type="button"
-//                     onClick={() => {
-//                       onClose?.();
-//                       navigate(`/dashboard/hotels/${id}/edit`);
-//                     }}
+//                     onClick={goEdit}
 //                     className="h-10 px-4 rounded-lg bg-neutral-800 text-white text-sm hover:bg-neutral-900 transition flex items-center gap-2"
 //                   >
-//                     Modifier
+//                     <FiEdit3 /> Modifier
 //                   </button>
 
 //                   <button
@@ -203,9 +190,7 @@
 //                   </button>
 //                 </div>
 
-//                 <div className="mt-4 text-xs text-neutral-400">
-//                   ID: {hotel.id}
-//                 </div>
+//                 <div className="mt-4 text-xs text-neutral-400">ID: {hotel.id}</div>
 //               </div>
 //             </div>
 //           )}
@@ -224,18 +209,19 @@ const API_RAW =
 const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
 export default function HotelDetailsModal({ id, onClose, onDeleted }) {
-  const navigate = useNavigate(); // ✅ IMPORTANT
+  const navigate = useNavigate();
 
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const BASE_URL = useMemo(() => API, []);
-
+  // ✅ Cloudinary: URL directe renvoyée par l'API
   const photoUrl = useMemo(() => {
-    if (!hotel?.photo) return "";
-    return hotel.photo.startsWith("http") ? hotel.photo : `${BASE_URL}${hotel.photo}`;
-  }, [hotel, BASE_URL]);
+    if (!hotel) return "";
+    if (hotel.photo_url) return hotel.photo_url;
+    if (typeof hotel.photo === "string" && hotel.photo.startsWith("http")) return hotel.photo;
+    return "";
+  }, [hotel]);
 
   const fallback =
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=60";
@@ -307,9 +293,8 @@ export default function HotelDetailsModal({ id, onClose, onDeleted }) {
   };
 
   const goEdit = () => {
-    // ✅ IMPORTANT: fermer le modal puis naviguer vers la route enfant
     onClose?.();
-    navigate(`${id}/edit`);
+    navigate(`${id}/edit`); // route enfant
   };
 
   return (
@@ -414,3 +399,4 @@ export default function HotelDetailsModal({ id, onClose, onDeleted }) {
     </div>
   );
 }
+
