@@ -82,7 +82,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function HotelCard({ hotel, onOpen }) {
   const navigate = useNavigate();
- <console className="log"></console>
   const formatPrice = (n, devise = "XOF") =>
     new Intl.NumberFormat("fr-FR").format(n) + " " + devise;
 
