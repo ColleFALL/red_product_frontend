@@ -1,9 +1,9 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const API_RAW =
-  import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
+  import.meta.env.VITE_API_URL ||
+  "https://red-product-backend-eymz.onrender.com";
 const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
 
 export default function HotelDetails() {
@@ -17,8 +17,12 @@ export default function HotelDetails() {
   // ✅ Cloudinary: URL directe renvoyée par l'API (photo_url)
   const photoUrl = useMemo(() => {
     if (!hotel) return "";
-    if (hotel.photo_url) return hotel.photo_url;
-    if (typeof hotel.photo === "string" && hotel.photo.startsWith("http")) return hotel.photo;
+    if (hotel.photo_url)
+      return hotel.photo_url.startsWith("http")
+        ? hotel.photo_url
+        : `${API}${hotel.photo_url}`;
+    if (typeof hotel.photo === "string" && hotel.photo.startsWith("http"))
+      return hotel.photo;
     return "";
   }, [hotel]);
 
@@ -38,13 +42,17 @@ export default function HotelDetails() {
 
       const ct = res.headers.get("content-type") || "";
       const raw = await res.text();
-      const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+      const data = ct.includes("application/json")
+        ? JSON.parse(raw || "null")
+        : raw;
 
       if (!res.ok) {
         const msg =
           typeof data === "string"
             ? data.slice(0, 200)
-            : data?.detail || data?.message || JSON.stringify(data).slice(0, 200);
+            : data?.detail ||
+              data?.message ||
+              JSON.stringify(data).slice(0, 200);
         throw new Error(`Erreur API (${res.status}) : ${msg}`);
       }
 
@@ -64,7 +72,9 @@ export default function HotelDetails() {
   }, [id]);
 
   const onDelete = async () => {
-    const ok = window.confirm("Supprimer cet hôtel ? Cette action est irréversible.");
+    const ok = window.confirm(
+      "Supprimer cet hôtel ? Cette action est irréversible.",
+    );
     if (!ok) return;
 
     try {
@@ -78,7 +88,9 @@ export default function HotelDetails() {
 
       if (!res.ok) {
         const raw = await res.text();
-        throw new Error(raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`);
+        throw new Error(
+          raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`,
+        );
       }
 
       navigate("/dashboard/hotels");
@@ -107,8 +119,12 @@ export default function HotelDetails() {
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xl font-semibold text-neutral-800">{hotel.nom}</div>
-              <div className="text-sm text-neutral-500 mt-1">{hotel.adresse}</div>
+              <div className="text-xl font-semibold text-neutral-800">
+                {hotel.nom}
+              </div>
+              <div className="text-sm text-neutral-500 mt-1">
+                {hotel.adresse}
+              </div>
               <div className="text-sm text-neutral-700 mt-3">
                 <span className="font-semibold">
                   {new Intl.NumberFormat("fr-FR").format(hotel.prix_par_nuit)}{" "}
@@ -140,12 +156,14 @@ export default function HotelDetails() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 text-sm">
             {"email" in hotel && (
               <div className="text-neutral-700">
-                <span className="text-neutral-500">Email :</span> {hotel.email || "-"}
+                <span className="text-neutral-500">Email :</span>{" "}
+                {hotel.email || "-"}
               </div>
             )}
             {"telephone" in hotel && (
               <div className="text-neutral-700">
-                <span className="text-neutral-500">Téléphone :</span> {hotel.telephone || "-"}
+                <span className="text-neutral-500">Téléphone :</span>{" "}
+                {hotel.telephone || "-"}
               </div>
             )}
           </div>
@@ -164,4 +182,3 @@ export default function HotelDetails() {
     </div>
   );
 }
-

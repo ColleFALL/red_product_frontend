@@ -16,8 +16,9 @@ const API = API_RAW.replace(/\/+$/, "");
 
 // Dans HotelCard :
 const photoUrl = hotel?.photo_url
-  ? `${API}${hotel.photo_url}` // <-- complète le chemin relatif
-  : ""; 
+    ? (hotel.photo_url.startsWith("http") ? hotel.photo_url : `${API}${hotel.photo_url}`)
+    : "";
+
 
     // ✅ Utilise toujours photo_url si disponible
   // const photoUrl = hotel?.photo_url || "";
