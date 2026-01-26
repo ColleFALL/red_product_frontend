@@ -4,22 +4,23 @@ import { useNavigate } from "react-router-dom";
 
 export default function HotelCard({ hotel, onOpen }) {
   const navigate = useNavigate();
+
   const formatPrice = (n, devise = "XOF") =>
     new Intl.NumberFormat("fr-FR").format(n) + " " + devise;
 
-  // ✅ Cloudinary URL : utiliser directement photo_url si fourni
-  const photoUrl = hotel?.photo_url && hotel.photo_url.startsWith("http")
-    ? hotel.photo_url
-    : hotel?.photo && hotel.photo.startsWith("http")
-      ? hotel.photo
-      : "";
+  // ✅ IMAGE LOCALE DJANGO
+  // Priorité :
+  // 1. photo_url (URL absolue générée par le backend)
+  // 2. photo (chemin /media/...)
+  // 3. fallback
+  const photoUrl = hotel?.photo_url || hotel?.photo || "";
 
   const fallback =
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=60";
 
   const open = () => {
-    if (onOpen) onOpen(hotel.id); // ouvre modal depuis HotelsList
-    else navigate(`/dashboard/hotels/${hotel.id}`); // fallback page détails
+    if (onOpen) onOpen(hotel.id);
+    else navigate(`/dashboard/hotels/${hotel.id}`);
   };
 
   return (
@@ -42,7 +43,9 @@ export default function HotelCard({ hotel, onOpen }) {
           alt={hotel.nom}
           className="h-full w-full object-cover"
           loading="lazy"
-          onError={(e) => (e.currentTarget.src = fallback)}
+          onError={(e) => {
+            e.currentTarget.src = fallback;
+          }}
         />
       </div>
 
