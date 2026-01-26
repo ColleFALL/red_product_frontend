@@ -11,10 +11,17 @@ export default function HotelCard({ hotel, onOpen }) {
   // // ✅ Cloudinary: URL directe renvoyée par l'API
   // const photoUrl =
   //  hotel?.photo_url || (typeof hotel?.photo === "string" && hotel.photo.startsWith("http") ? hotel.photo : "");
-  
+  const API_RAW = import.meta.env.VITE_API_URL || "https://red-product-backend-eymz.onrender.com";
+const API = API_RAW.replace(/\/+$/, "");
+
+// Dans HotelCard :
+const photoUrl = hotel?.photo_url
+  ? `${API}${hotel.photo_url}` // <-- complète le chemin relatif
+  : ""; 
+
     // ✅ Utilise toujours photo_url si disponible
-  const photoUrl = hotel?.photo_url || "";
-  
+  // const photoUrl = hotel?.photo_url || "";
+
    const fallback =
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=60";
 
