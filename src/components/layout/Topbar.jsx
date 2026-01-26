@@ -2,12 +2,9 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
-import { useLocation } from "react-router-dom";
 
 export default function Topbar({ onMenuClick = () => {} }) {
   const navigate = useNavigate();
-    const location = useLocation();
-
   const fileRef = useRef(null);
 
   // 🔎 Recherche globale
@@ -37,49 +34,9 @@ export default function Topbar({ onMenuClick = () => {} }) {
   });
 
   const handleBack = () => {
-    const path = location.pathname;
-    
-    // ✅ Si on est dans un formulaire/modal d'hôtel, retour à la liste
-    if (path.includes('/hotels/new') || path.match(/\/hotels\/\d+\/edit/)) {
-      navigate('/dashboard/hotels');
-      return;
-    }
-    
-    // ✅ Si on est sur les détails d'un hôtel, retour à la liste
-    if (path.match(/\/hotels\/\d+$/)) {
-      navigate('/dashboard/hotels');
-      return;
-    }
-    
-    // ✅ Sinon, comportement par défaut
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/dashboard');
-    }
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/dashboard");
   };
-
-  // ... reste du code ...
-}
- handleBack = () => {
-  const path = location.pathname;
-  
-  // ✅ Depuis /dashboard/hotels/* → retour à /dashboard/hotels
-  if (path.startsWith('/dashboard/hotels') && path !== '/dashboard/hotels') {
-    navigate('/dashboard/hotels');
-    return;
-  }
-  
-  // ✅ Depuis /dashboard/* → retour à /dashboard
-  if (path.startsWith('/dashboard') && path !== '/dashboard') {
-    navigate('/dashboard');
-    return;
-  }
-  
-  // ✅ Par défaut
-  navigate('/dashboard');
-};
-
 
   const userName = user?.name || user?.email || "Utilisateur";
 
