@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { mockRegister } from "../../services/authMock";
+// import { mockRegister } from "../../services/authMock";
+import { registerApi } from "../../services/authApi";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -32,10 +33,11 @@ export default function Register() {
     }
 
     try {
-      await mockRegister({
-        fullName: form.name,
+      await registerApi({
+        name: form.name,
         email: form.email,
         password: form.password,
+        accept: form.accept,
       });
 
       setStatus({ type: "success", message: "Compte créé ! Connectez-vous." });
@@ -125,9 +127,7 @@ export default function Register() {
               {status.message && (
                 <p
                   className={`text-sm ${
-                    status.type === "error"
-                      ? "text-red-600"
-                      : "text-green-600"
+                    status.type === "error" ? "text-red-600" : "text-green-600"
                   }`}
                 >
                   {status.message}
