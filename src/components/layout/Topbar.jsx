@@ -2,13 +2,39 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
-
 import { useLocation } from "react-router-dom";
 
 export default function Topbar({ onMenuClick = () => {} }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  // ... reste du code ...
+    const location = useLocation();
+
+  const fileRef = useRef(null);
+
+  // 🔎 Recherche globale
+  const { search, setSearch } = useSearch();
+  const [local, setLocal] = useState(search || "");
+
+  // ✅ si search change ailleurs, on sync l’input
+  useEffect(() => {
+    setLocal(search || "");
+  }, [search]);
+
+  // ✅ debounce léger : met à jour le search global
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(local), 200);
+    return () => clearTimeout(t);
+  }, [local, setSearch]);
+
+  const [uploading, setUploading] = useState(false);
+
+  // ✅ user local (mis à jour après upload)
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  });
 
   const handleBack = () => {
     const path = location.pathname;
@@ -35,6 +61,25 @@ export default function Topbar({ onMenuClick = () => {} }) {
 
   // ... reste du code ...
 }
+ handleBack = () => {
+  const path = location.pathname;
+  
+  // ✅ Depuis /dashboard/hotels/* → retour à /dashboard/hotels
+  if (path.startsWith('/dashboard/hotels') && path !== '/dashboard/hotels') {
+    navigate('/dashboard/hotels');
+    return;
+  }
+  
+  // ✅ Depuis /dashboard/* → retour à /dashboard
+  if (path.startsWith('/dashboard') && path !== '/dashboard') {
+    navigate('/dashboard');
+    return;
+  }
+  
+  // ✅ Par défaut
+  navigate('/dashboard');
+};
+
 
   const userName = user?.name || user?.email || "Utilisateur";
 
