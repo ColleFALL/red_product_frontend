@@ -395,56 +395,60 @@ export default function HotelCreate() {
   }, [form.photoPreview]);
 
   // ✅ Edit: pré-remplir depuis l’API
-  useEffect(() => {
-    if (!isEdit) return;
+ useEffect(() => {
+  if (!isEdit) return;
 
-    const fetchHotel = async () => {
-      try {
-        const token = localStorage.getItem("access");
-        if (!token) throw new Error("Non connecté : token manquant.");
+  const fetchHotel = async () => {
+    try {
+      const token = localStorage.getItem("access");
+      if (!token) throw new Error("Non connecté : token manquant.");
 
-        const res = await fetch(`${API}/api/hotels/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const res = await fetch(`${API}/api/hotels/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const ct = res.headers.get("content-type") || "";
-        const raw = await res.text();
-        const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+      const ct = res.headers.get("content-type") || "";
+      const raw = await res.text();
+      const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
 
-        if (!res.ok) {
-          const msg =
-            typeof data === "string"
-              ? data.slice(0, 200)
-              : data?.detail || JSON.stringify(data).slice(0, 200);
-          throw new Error(`Erreur API (${res.status}) : ${msg}`);
-        }
-
-        // ✅ Cloudinary : utiliser photo_url en priorité
-        const preview =
-          data?.photo_url ||
-          (typeof data?.photo === "string" && data.photo.startsWith("http") ? data.photo : "");
-
-        setForm((p) => ({
-          ...p,
-          nom: data?.nom || "",
-          adresse: data?.adresse || "",
-          email: data?.email || "",
-          telephone: data?.telephone || "",
-          prix_par_nuit: String(data?.prix_par_nuit ?? ""),
-          devise: data?.devise || "XOF",
-          photo: null,
-          photoPreview: preview,
-        }));
-      } catch (err) {
-        console.error(err);
-        alert(err.message || "Erreur chargement hôtel.");
-        close();
+      if (!res.ok) {
+        const msg =
+          typeof data === "string"
+            ? data.slice(0, 200)
+            : data?.detail || JSON.stringify(data).slice(0, 200);
+        throw new Error(`Erreur API (${res.status}) : ${msg}`);
       }
-    };
 
-    fetchHotel();
-    // eslint-disable-next-line
-  }, [isEdit, id]);
+      // ✅ uniquement localstorage / serveur
+      const preview =
+        typeof data?.photo === "string"
+          ? data.photo.startsWith("http")
+            ? data.photo
+            : `${API}${data.photo}`
+          : "";
+
+      setForm((p) => ({
+        ...p,
+        nom: data?.nom || "",
+        adresse: data?.adresse || "",
+        email: data?.email || "",
+        telephone: data?.telephone || "",
+        prix_par_nuit: String(data?.prix_par_nuit ?? ""),
+        devise: data?.devise || "XOF",
+        photo: null,
+        photoPreview: preview,
+      }));
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Erreur chargement hôtel.");
+      close();
+    }
+  };
+
+  fetchHotel();
+  // eslint-disable-next-line
+}, [isEdit, id]);
+
 
   const onChange = (e) => {
     const { name, value } = e.target;
