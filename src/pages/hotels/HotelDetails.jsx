@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const API_RAW =
   import.meta.env.VITE_API_URL ||
   "https://red-product-backend-eymz.onrender.com";
-const API = API_RAW.replace(/\/+$/, "").replace(/\/api\/?$/i, "");
+const API = API_RAW.replace(/\/+$/, "");
 
 export default function HotelDetails() {
   const { id } = useParams();
@@ -14,15 +14,11 @@ export default function HotelDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ Cloudinary: URL directe renvoyée par l'API (photo_url)
+  // ✅ Cloudinary URL : utiliser directement photo_url si fourni
   const photoUrl = useMemo(() => {
     if (!hotel) return "";
-    if (hotel.photo_url)
-      return hotel.photo_url.startsWith("http")
-        ? hotel.photo_url
-        : `${API}${hotel.photo_url}`;
-    if (typeof hotel.photo === "string" && hotel.photo.startsWith("http"))
-      return hotel.photo;
+    if (hotel.photo_url && hotel.photo_url.startsWith("http")) return hotel.photo_url;
+    if (hotel.photo && hotel.photo.startsWith("http")) return hotel.photo;
     return "";
   }, [hotel]);
 
@@ -40,19 +36,10 @@ export default function HotelDetails() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const ct = res.headers.get("content-type") || "";
-      const raw = await res.text();
-      const data = ct.includes("application/json")
-        ? JSON.parse(raw || "null")
-        : raw;
+      const data = await res.json();
 
       if (!res.ok) {
-        const msg =
-          typeof data === "string"
-            ? data.slice(0, 200)
-            : data?.detail ||
-              data?.message ||
-              JSON.stringify(data).slice(0, 200);
+        const msg = data?.detail || JSON.stringify(data).slice(0, 200);
         throw new Error(`Erreur API (${res.status}) : ${msg}`);
       }
 
@@ -68,13 +55,10 @@ export default function HotelDetails() {
 
   useEffect(() => {
     fetchHotel();
-    // eslint-disable-next-line
   }, [id]);
 
   const onDelete = async () => {
-    const ok = window.confirm(
-      "Supprimer cet hôtel ? Cette action est irréversible.",
-    );
+    const ok = window.confirm("Supprimer cet hôtel ? Cette action est irréversible.");
     if (!ok) return;
 
     try {
@@ -88,9 +72,7 @@ export default function HotelDetails() {
 
       if (!res.ok) {
         const raw = await res.text();
-        throw new Error(
-          raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`,
-        );
+        throw new Error(raw?.slice?.(0, 200) || `Erreur suppression (${res.status})`);
       }
 
       navigate("/dashboard/hotels");
@@ -119,12 +101,8 @@ export default function HotelDetails() {
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xl font-semibold text-neutral-800">
-                {hotel.nom}
-              </div>
-              <div className="text-sm text-neutral-500 mt-1">
-                {hotel.adresse}
-              </div>
+              <div className="text-xl font-semibold text-neutral-800">{hotel.nom}</div>
+              <div className="text-sm text-neutral-500 mt-1">{hotel.adresse}</div>
               <div className="text-sm text-neutral-700 mt-3">
                 <span className="font-semibold">
                   {new Intl.NumberFormat("fr-FR").format(hotel.prix_par_nuit)}{" "}
@@ -154,16 +132,14 @@ export default function HotelDetails() {
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2 text-sm">
-            {"email" in hotel && (
+            {hotel.email && (
               <div className="text-neutral-700">
-                <span className="text-neutral-500">Email :</span>{" "}
-                {hotel.email || "-"}
+                <span className="text-neutral-500">Email :</span> {hotel.email || "-"}
               </div>
             )}
-            {"telephone" in hotel && (
+            {hotel.telephone && (
               <div className="text-neutral-700">
-                <span className="text-neutral-500">Téléphone :</span>{" "}
-                {hotel.telephone || "-"}
+                <span className="text-neutral-500">Téléphone :</span> {hotel.telephone || "-"}
               </div>
             )}
           </div>
