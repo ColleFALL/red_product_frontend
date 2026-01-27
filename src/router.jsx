@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ActivateAccount from "./pages/auth/ActivateAccount";  // ✅ NOUVEAU
 
 import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -16,6 +17,8 @@ export const router = createBrowserRouter([
    { path: "/login", element: <Login /> }, //  AJOUT
   { path: "/register", element: <Register /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/activate/:uid/:token", element: <ActivateAccount /> },  // ✅ NOUVEAU
+
 
   //  Layout dashboard + pages internes
   {
