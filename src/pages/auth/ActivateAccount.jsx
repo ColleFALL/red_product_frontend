@@ -10,33 +10,53 @@ export default function ActivateAccount() {
     message: "Activation de votre compte en cours...",
   });
 
-  useEffect(() => {
-    const activate = async () => {
-      try {
-        await activateAccountApi({ uid, token });
+  // Crée une référence pour suivre si l'appel a déjà été fait
+const activationStarted = useRef(false);
 
+useEffect(() => {
+  const activate = async () => {
+    // Si l'activation a déjà été lancée une fois, on arrête tout
+    if (activationStarted.current) return;
+    activationStarted.current = true;
+
+    try {
+      await activateAccountApi({ uid, token });
+
+      setStatus({
+        type: "success",
+        message: "Votre compte a été activé avec succès ! Redirection en cours...",
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+
+    } catch (error) {
+      console.error("Erreur d'activation:", error);
+
+      // On vérifie si l'erreur est due au fait que le compte est déjà actif (400 ou 403)
+      // Djoser renvoie souvent une erreur 400 si le token a déjà été utilisé
+      const isAlreadyActive = error.response?.status === 400 || error.response?.status === 403;
+
+      if (isAlreadyActive) {
         setStatus({
           type: "success",
-          message: "Votre compte a été activé avec succès ! Vous pouvez maintenant vous connecter.",
+          message: "Ce compte est déjà activé. Vous allez être redirigé vers la page de connexion.",
         });
-
-        // Redirection automatique après 3 secondes
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      } catch (error) {
-        console.error(error);
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
         setStatus({
           type: "error",
-          message: error.message || "Erreur lors de l'activation. Le lien est peut-être expiré ou invalide.",
+          message: error.response?.data?.detail || "Lien invalide ou expiré. Veuillez demander un nouveau mail.",
         });
       }
-    };
-
-    if (uid && token) {
-      activate();
     }
-  }, [uid, token, navigate]);
+  };
+
+  if (uid && token) {
+    activate();
+  }
+}, [uid, token, navigate]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
