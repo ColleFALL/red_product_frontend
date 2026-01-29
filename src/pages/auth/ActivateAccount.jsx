@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { activateAccountApi } from "../../services/authApi";
 
@@ -6,18 +6,17 @@ export default function ActivateAccount() {
   const { uid, token } = useParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState({
-    type: "loading",
-    message: "Activation de votre compte en cours...",
+    type: "idle", // "idle" (attente), "loading", "success", "error"
+    message: "",
   });
 
-  // Crée une référence pour suivre si l'appel a déjà été fait
-const activationStarted = useRef(false);
+  const activationStarted = useRef(false);
 
-useEffect(() => {
-  const activate = async () => {
-    // Si l'activation a déjà été lancée une fois, on arrête tout
+  const handleActivation = async () => {
     if (activationStarted.current) return;
     activationStarted.current = true;
+
+    setStatus({ type: "loading", message: "Activation de votre compte en cours..." });
 
     try {
       await activateAccountApi({ uid, token });
@@ -34,17 +33,17 @@ useEffect(() => {
     } catch (error) {
       console.error("Erreur d'activation:", error);
 
-      // On vérifie si l'erreur est due au fait que le compte est déjà actif (400 ou 403)
-      // Djoser renvoie souvent une erreur 400 si le token a déjà été utilisé
+      // Gestion intelligente du compte déjà actif (400 ou 403)
       const isAlreadyActive = error.response?.status === 400 || error.response?.status === 403;
 
       if (isAlreadyActive) {
         setStatus({
           type: "success",
-          message: "Ce compte est déjà activé. Vous allez être redirigé vers la page de connexion.",
+          message: "Ce compte est déjà activé. Vous allez être redirigé vers la connexion.",
         });
         setTimeout(() => navigate("/login"), 3000);
       } else {
+        activationStarted.current = false; // Permet de réessayer si c'est une vraie erreur réseau
         setStatus({
           type: "error",
           message: error.response?.data?.detail || "Lien invalide ou expiré. Veuillez demander un nouveau mail.",
@@ -53,13 +52,8 @@ useEffect(() => {
     }
   };
 
-  if (uid && token) {
-    activate();
-  }
-}, [uid, token, navigate]);
-
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-neutral-900">
       <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
@@ -78,7 +72,23 @@ useEffect(() => {
               Activation du compte
             </h2>
 
-            <div className="text-center py-8">
+            <div className="text-center py-4">
+              {/* État initial : Propose l'activation */}
+              {status.type === "idle" && (
+                <div className="flex flex-col items-center gap-6">
+                  <p className="text-neutral-600">
+                    Merci d'avoir rejoint RED PRODUCT. Cliquez ci-dessous pour activer votre profil.
+                  </p>
+                  <button
+                    onClick={handleActivation}
+                    className="w-full py-3 bg-neutral-800 text-white rounded shadow-lg hover:bg-black transition-all font-medium"
+                  >
+                    Activer mon compte
+                  </button>
+                </div>
+              )}
+
+              {/* État : Chargement */}
               {status.type === "loading" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-12 h-12 border-4 border-neutral-200 border-t-neutral-600 rounded-full animate-spin"></div>
@@ -86,6 +96,7 @@ useEffect(() => {
                 </div>
               )}
 
+              {/* État : Succès */}
               {status.type === "success" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -94,10 +105,11 @@ useEffect(() => {
                     </svg>
                   </div>
                   <p className="text-green-600 font-medium text-center">{status.message}</p>
-                  <p className="text-sm text-neutral-500">Redirection automatique...</p>
+                  <p className="text-sm text-neutral-500 italic">Redirection automatique...</p>
                 </div>
               )}
 
+              {/* État : Erreur */}
               {status.type === "error" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
