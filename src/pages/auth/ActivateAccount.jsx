@@ -12,46 +12,51 @@ export default function ActivateAccount() {
 
   const activationStarted = useRef(false);
 
-  const handleActivation = async () => {
-    if (activationStarted.current) return;
-    activationStarted.current = true;
+ const handleActivation = async () => {
+  if (activationStarted.current) return;
+  activationStarted.current = true;
 
-    setStatus({ type: "loading", message: "Activation de votre compte en cours..." });
+  setStatus({ type: "loading", message: "Activation de votre compte en cours..." });
 
-    try {
-      await activateAccountApi({ uid, token });
+  try {
+    await activateAccountApi({ uid, token });
 
+    setStatus({
+      type: "success",
+      message: "Votre compte a été activé avec succès ! Redirection en cours...",
+    });
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 3000);
+
+  } catch (error) {
+    console.error("Détails erreur:", error.response);
+
+    // Analyse de l'erreur 400
+    // Djoser renvoie souvent "Invalid token" si le compte est DEJÀ actif 
+    // ou si on clique deux fois sur le bouton.
+    const isAlreadyActive = 
+      error.response?.status === 400 || 
+      error.response?.status === 403;
+
+    if (isAlreadyActive) {
+      // On traite cela comme un succès car l'objectif (compte actif) est atteint
       setStatus({
         type: "success",
-        message: "Votre compte a été activé avec succès ! Redirection en cours...",
+        message: "Votre compte est déjà actif ! Vous allez être redirigé...",
       });
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
-
-    } catch (error) {
-      console.error("Erreur d'activation:", error);
-
-      // Gestion intelligente du compte déjà actif (400 ou 403)
-      const isAlreadyActive = error.response?.status === 400 || error.response?.status === 403;
-
-      if (isAlreadyActive) {
-        setStatus({
-          type: "success",
-          message: "Ce compte est déjà activé. Vous allez être redirigé vers la connexion.",
-        });
-        setTimeout(() => navigate("/login"), 3000);
-      } else {
-        activationStarted.current = false; // Permet de réessayer si c'est une vraie erreur réseau
-        setStatus({
-          type: "error",
-          message: error.response?.data?.detail || "Lien invalide ou expiré. Veuillez demander un nouveau mail.",
-        });
-      }
+      setTimeout(() => navigate("/login"), 3000);
+    } else {
+      // Ici, c'est une vraie erreur (ex: lien vraiment expiré ou serveur crashé)
+      activationStarted.current = false; // On permet à l'utilisateur de réessayer
+      setStatus({
+        type: "error",
+        message: error.response?.data?.detail || "Le lien est invalide ou a expiré. Veuillez demander un nouveau mail.",
+      });
     }
-  };
-
+  }
+};
   return (
     <div className="min-h-screen relative overflow-hidden bg-neutral-900">
       <div className="absolute inset-0 bg-black/70" />
@@ -63,7 +68,7 @@ export default function ActivateAccount() {
             <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
               <div className="w-3 h-3 bg-white rotate-45" />
             </div>
-            <div className="tracking-widest font-semibold">RED PRODUCT</div>
+            <div className="tracking-widest test-yellow-600 font-semibold">RED PRODUCT</div>
           </div>
 
           {/* Card */}
