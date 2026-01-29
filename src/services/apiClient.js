@@ -45,16 +45,20 @@ const raw = await res.text();
 const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
 
 
-  if (!res.ok) {
-    const message =
-      data?.message ||
-      data?.detail ||
-      (typeof data === "string" ? data : null) ||
-      "Erreur API";
-    throw new Error(message);
-  }
-
-  return data;
+  // Remplace ton bloc de gestion d'erreur actuel par celui-ci :
+if (!res.ok) {
+    let errorMessage = "Erreur API";
+    
+    if (data && typeof data === 'object') {
+        // Si Djoser renvoie {"email": ["..."], "password": ["..."]}
+        const firstKey = Object.keys(data)[0];
+        const errorContent = data[firstKey];
+        errorMessage = Array.isArray(errorContent) ? errorContent[0] : (data.detail || errorContent);
+    } else if (typeof data === "string") {
+        errorMessage = data;
+    }
+    
+    throw new Error(errorMessage);
 }
 
 export const api = {
