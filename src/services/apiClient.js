@@ -1,12 +1,4 @@
-// const BASE_URL = import.meta.env.VITE_API_URL; 
 const BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
-
-
-if (!BASE_URL) {
-  // Ça aide à détecter un oubli de variable d'environnement
-  console.log("API BASE URL =", import.meta.env.VITE_API_URL);
-  console.log("BASE_URL =", BASE_URL);
-}
 
 export function getToken() {
   return localStorage.getItem("access") || localStorage.getItem("token");
@@ -20,7 +12,7 @@ export function setToken(access, refresh = null) {
 export function clearToken() {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
-  localStorage.removeItem("token"); // si tu l’utilisais avant
+  localStorage.removeItem("token");
 }
 
 async function request(path, { method = "GET", body, isForm = false, auth = false } = {}) {
@@ -34,23 +26,20 @@ async function request(path, { method = "GET", body, isForm = false, auth = fals
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {
-    
     method,
     headers,
     body: isForm ? body : body ? JSON.stringify(body) : undefined,
   });
 
   const ct = res.headers.get("content-type") || "";
-const raw = await res.text();
-const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+  const raw = await res.text();
+  const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
 
-
-  // Remplace ton bloc de gestion d'erreur actuel par celui-ci :
-if (!res.ok) {
+  if (!res.ok) {
     let errorMessage = "Erreur API";
     
+    // Extraction intelligente des erreurs Djoser
     if (data && typeof data === 'object') {
-        // Si Djoser renvoie {"email": ["..."], "password": ["..."]}
         const firstKey = Object.keys(data)[0];
         const errorContent = data[firstKey];
         errorMessage = Array.isArray(errorContent) ? errorContent[0] : (data.detail || errorContent);
@@ -59,6 +48,9 @@ if (!res.ok) {
     }
     
     throw new Error(errorMessage);
+  }
+
+  return data;
 }
 
 export const api = {
