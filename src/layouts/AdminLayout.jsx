@@ -9,25 +9,25 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadMe = async () => {
-      try {
-        // ✅ Appel /api/auth/me (auth: true)
-        const res = await meApi(); // { success, message, data: admin }
-        const user = res?.data;
+ useEffect(() => {
+  const loadMe = async () => {
+    const access = localStorage.getItem("access") || localStorage.getItem("token");
+    if (!access) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-        }
-      } catch (e) {
-        // Si token expiré / pas connecté => retour login
-        // (on reste simple, pas de refresh token ici)
-        navigate("/login", { replace: true });
-      }
-    };
+    try {
+      const user = await meApi();
+      if (user) localStorage.setItem("user", JSON.stringify(user));
+    } catch (e) {
+      navigate("/login", { replace: true });
+    }
+  };
 
-    loadMe();
-  }, [navigate]);
+  loadMe();
+}, [navigate]);
+
 
  return (
   <SearchProvider>

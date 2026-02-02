@@ -52,7 +52,7 @@ export default function ActivateAccount() {
       activationStarted.current = false; // On permet à l'utilisateur de réessayer
       setStatus({
         type: "error",
-        message: error.response?.data?.detail || "Le lien est invalide ou a expiré. Veuillez demander un nouveau mail.",
+        message: error.response?.data?.detail ||  "Le lien d’activation est invalide ou a expiré. Si votre compte est déjà actif, vous pouvez vous connecter. Sinon, veuillez demander un nouveau lien."
       });
     }
   }

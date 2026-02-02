@@ -22,7 +22,8 @@ export default function Sidebar({ onNavigate }) {
   }, []);
   const isOnline = !!localStorage.getItem("access");
 
-  const userName = user?.name || user?.email || "Utilisateur";
+const userName = user?.name || user?.fullName || user?.username || user?.email || "Utilisateur";
+
 
   const initials = useMemo(() => {
     const parts = String(userName).trim().split(/\s+/).filter(Boolean);

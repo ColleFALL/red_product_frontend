@@ -15,7 +15,10 @@ export function clearToken() {
   localStorage.removeItem("token");
 }
 
-async function request(path, { method = "GET", body, isForm = false, auth = false } = {}) {
+async function request(
+  path,
+  { method = "GET", body, isForm = false, auth = false } = {},
+) {
   const headers = {};
 
   if (!isForm) headers["Content-Type"] = "application/json";
@@ -33,21 +36,28 @@ async function request(path, { method = "GET", body, isForm = false, auth = fals
 
   const ct = res.headers.get("content-type") || "";
   const raw = await res.text();
-  const data = ct.includes("application/json") ? JSON.parse(raw || "null") : raw;
+  const data = ct.includes("application/json")
+    ? JSON.parse(raw || "null")
+    : raw;
 
   if (!res.ok) {
     let errorMessage = "Erreur API";
-    
+
     // Extraction intelligente des erreurs Djoser
-    if (data && typeof data === 'object') {
-        const firstKey = Object.keys(data)[0];
-        const errorContent = data[firstKey];
-        errorMessage = Array.isArray(errorContent) ? errorContent[0] : (data.detail || errorContent);
+    if (data && typeof data === "object") {
+      const firstKey = Object.keys(data)[0];
+      const errorContent = data[firstKey];
+      errorMessage = Array.isArray(errorContent)
+        ? errorContent[0]
+        : data.detail || errorContent;
     } else if (typeof data === "string") {
-        errorMessage = data;
+      errorMessage = data;
     }
-    
-    throw new Error(errorMessage);
+
+    const err = new Error(errorMessage);
+    err.status = res.status;
+    err.data = data;
+    throw err;
   }
 
   return data;
@@ -58,6 +68,8 @@ export const api = {
   post: (path, body, opts) => request(path, { ...opts, method: "POST", body }),
   put: (path, body, opts) => request(path, { ...opts, method: "PUT", body }),
   del: (path, opts) => request(path, { ...opts, method: "DELETE" }),
-  form: (path, formData, opts) => request(path, { ...opts, method: "POST", body: formData, isForm: true }),
-  formPut: (path, formData, opts) => request(path, { ...opts, method: "PUT", body: formData, isForm: true }),
+  form: (path, formData, opts) =>
+    request(path, { ...opts, method: "POST", body: formData, isForm: true }),
+  formPut: (path, formData, opts) =>
+    request(path, { ...opts, method: "PUT", body: formData, isForm: true }),
 };
