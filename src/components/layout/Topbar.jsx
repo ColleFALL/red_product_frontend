@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FiBell, FiMenu, FiSearch, FiArrowRight } from "react-icons/fi";
 import { useSearch } from "../../context/SearchContext";
 
@@ -10,6 +10,8 @@ export default function Topbar({ onMenuClick = () => {} }) {
   // 🔎 Recherche globale
   const { search, setSearch } = useSearch();
   const [local, setLocal] = useState(search || "");
+  
+  const location = useLocation();
 
   // ✅ si search change ailleurs, on sync l’input
   useEffect(() => {
