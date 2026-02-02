@@ -77,7 +77,10 @@ Ce frontend communique avec l’API backend disponible ici :
  Repo Backend : https://github.com/ColleFALL/red_product_backend.git
 
 
+## Contexte
 
+Projet réalisé dans le cadre d’un stage de fin de formation
+Objectif : concevoir une interface utilisateur moderne, sécurisée et maintenable.
 
 
 
