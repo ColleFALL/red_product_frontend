@@ -107,7 +107,7 @@ export default function HotelsList() {
       </div>
 
       <div className="px-6 py-5">
-        <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+        <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(230px,1fr))]">
           {filteredHotels.map((hotel) => (
             <HotelCard key={hotel.id} hotel={hotel} onOpen={setSelectedId} />
           ))}
