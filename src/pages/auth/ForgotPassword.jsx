@@ -93,7 +93,7 @@ export default function ForgotPassword() {
       setStatus({
         type: "success",
         message:
-          "Si cet e-mail existe, un lien de réinitialisation a été envoyé. (En local : regarde le terminal Django)",
+          "Si cet e-mail existe, un lien de réinitialisation a été envoyé. ",
       });
     } catch (err) {
       setStatus({ type: "error", message: err.message || "Erreur." });
