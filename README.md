@@ -1,16 +1,107 @@
-# React + Vite
+# RED PRODUCT – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+##  Description
+Ce dépôt contient la partie **frontend** de l’application RED PRODUCT.
+Il s’agit d’une interface web moderne permettant aux administrateurs
+d’interagir avec la plateforme de gestion hôtelière via un tableau de bord.
 
-Currently, two official plugins are available:
+Le frontend consomme une API REST sécurisée développée avec Django.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+##  Technologies utilisées
+- React (Vite)
+- React Router DOM
+- Tailwind CSS
+- React Icons
+- Fetch API (client HTTP personnalisé)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+##  Fonctionnalités
+- Authentification utilisateur (connexion / déconnexion)
+- Activation de compte par email
+- Réinitialisation du mot de passe
+- Tableau de bord administrateur
+- Sidebar et Topbar dynamiques
+- Interface responsive (desktop et mobile)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+##  Structure du projet
+
+src/
+│── components/
+│ ├── layout/ (Sidebar, Topbar)
+│ └── hotels/
+│
+│── pages/
+│ ├── auth/ (login, register, activation, reset password)
+│ ├── dashboard/
+│ └── hotels/
+│
+│── services/
+│ ├── apiClient.js
+│ └── authApi.js
+│
+│── context/
+│ └── SearchContext.jsx
+│
+│── layouts/
+│ └── AdminLayout.jsx
+
+
+---
+
+##  Gestion de l’authentification
+- Authentification basée sur JWT
+- Token stocké côté client (`localStorage`)
+- Récupération automatique de l’utilisateur connecté via `/me`
+- Protection des routes privées via layout
+
+---
+
+##  Variables d’environnement
+
+Créer un fichier `.env` à la racine :
+
+```env
+VITE_API_URL= https://red-product-backend-eymz.onrender.com
+
+## Installation et lancement
+npm install
+npm run dev
+L’application sera accessible sur : http://localhost:5173
+## Backend
+Ce frontend communique avec l’API backend disponible ici :
+ Repo Backend : https://github.com/ColleFALL/red_product_backend.git
+
+
+## Contexte
+
+Projet réalisé dans le cadre d’un stage de fin de formation
+Objectif : concevoir une interface utilisateur moderne, sécurisée et maintenable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
