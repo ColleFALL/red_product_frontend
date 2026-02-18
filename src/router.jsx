@@ -12,6 +12,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import HotelsList from "./pages/hotels/HotelsList";
 import HotelCreate from "../src/pages/hotels/HotelCreate";
 import HotelDetails from "./pages/hotels/HotelDetails";
+import ChatbotPage from './pages/chatbot/ChatbotPage';
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -33,13 +34,14 @@ export const router = createBrowserRouter([
       element: <HotelsList />,
       children: [
         { path: "new", element: <HotelCreate /> }, //  modal
-        { path: ":id", element: <HotelDetails /> },       // détails ✅
-        { path: ":id/edit", element: <HotelCreate /> },   // modifier ✅
+        { path: ":id", element: <HotelDetails /> },       // détails 
+        { path: ":id/edit", element: <HotelCreate /> },   // modifier 
     ],
-      }
+      },
+      {path: 'chatbot',element: <ChatbotPage />}
+
     ]
   },
 
   { path: "hotels/create", element: <Navigate to="/dashboard/hotels/new" replace /> },
-
 ]);

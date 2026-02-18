@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiGrid, FiHome, FiLogOut } from "react-icons/fi";
 import { clearToken } from "../../services/apiClient"; // adapte le chemin si besoin
+import { Bot } from 'lucide-react';
 
 export default function Sidebar({ onNavigate }) {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ return (
             onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-2 text-sm transition
-              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80"}`
+              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80 hover:bg-white/10"}`
             }
           >
             <FiGrid />
@@ -71,11 +72,24 @@ return (
             onClick={onNavigate}
             className={({ isActive }) =>
               `w-full flex items-center gap-3 px-4 py-2 text-sm transition
-              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80"}`
+              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80 hover:bg-white/10"}`
             }
           >
             <FiHome />
             Liste des hôtels
+          </NavLink>
+
+          {/* ✅ NOUVEAU - Lien chatbot */}
+          <NavLink
+            to="/dashboard/chatbot" 
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `w-full flex items-center gap-3 px-4 py-2 text-sm transition
+              ${isActive ? "bg-neutral-200 text-neutral-900" : "text-white/80 hover:bg-white/10"}`
+            }
+          >
+            <Bot className="w-5 h-5" />
+            Assistant IA
           </NavLink>
         </nav>
       </div>
@@ -111,5 +125,4 @@ return (
     </div>
   </aside>
 );
-
 }
