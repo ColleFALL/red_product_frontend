@@ -1,66 +1,66 @@
 import React, { useState, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { activateAccountApi } from "../../services/authApi";
 
 export default function ActivateAccount() {
-  const { uid, token } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [status, setStatus] = useState({
-    type: "idle", // "idle" (attente), "loading", "success", "error"
-    message: "",
-  });
-
+  const [status, setStatus] = useState({ type: "idle", message: "" });
   const activationStarted = useRef(false);
 
- const handleActivation = async () => {
-  if (activationStarted.current) return;
-  activationStarted.current = true;
+  const queryParams = new URLSearchParams(location.search);
+  const uid = queryParams.get("uid");
+  let token = queryParams.get("token");
 
-  setStatus({ type: "loading", message: "Activation de votre compte en cours..." });
+  // ✅ Encodage URL-safe pour Djoser
+  if (token) {
+    token = encodeURIComponent(token);
+  }
 
-  try {
-    await activateAccountApi({ uid, token });
+  const handleActivation = async () => {
+    if (activationStarted.current) return;
+    activationStarted.current = true;
 
-    setStatus({
-      type: "success",
-      message: "Votre compte a été activé avec succès ! Redirection en cours...",
-    });
+    setStatus({ type: "loading", message: "Activation de votre compte en cours..." });
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 3000);
+    try {
+      await activateAccountApi({ uid, token });
 
-  } catch (error) {
-    console.error("Détails erreur:", error.response);
-
-    // Analyse de l'erreur 400
-    // Djoser renvoie souvent "Invalid token" si le compte est DEJÀ actif 
-    // ou si on clique deux fois sur le bouton.
-    const isAlreadyActive = 
-      error.response?.status === 400 || 
-      error.response?.status === 403;
-
-    if (isAlreadyActive) {
-      // On traite cela comme un succès car l'objectif (compte actif) est atteint
       setStatus({
         type: "success",
-        message: "Votre compte est déjà actif ! Vous allez être redirigé...",
+        message: "Votre compte a été activé avec succès ! Redirection en cours...",
       });
+
       setTimeout(() => navigate("/login"), 3000);
-    } else {
-      // Ici, c'est une vraie erreur (ex: lien vraiment expiré ou serveur crashé)
-      activationStarted.current = false; // On permet à l'utilisateur de réessayer
-      setStatus({
-        type: "error",
-        message: error.response?.data?.detail ||  "Le lien d’activation est invalide ou a expiré. Si votre compte est déjà actif, vous pouvez vous connecter. Sinon, veuillez demander un nouveau lien."
-      });
+
+    } catch (error) {
+      console.error("Détails erreur:", error.response);
+
+      const isAlreadyActive = error.response?.status === 400 || error.response?.status === 403;
+
+      if (isAlreadyActive) {
+        setStatus({
+          type: "success",
+          message: "Votre compte est déjà actif ! Vous allez être redirigé...",
+        });
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        activationStarted.current = false;
+        setStatus({
+          type: "error",
+          message:
+            error.response?.data?.detail ||
+            "Le lien d’activation est invalide ou a expiré. Si votre compte est déjà actif, vous pouvez vous connecter. Sinon, demandez un nouveau lien.",
+        });
+        console.log("UID:", uid);
+        console.log("TOKEN:", token);
+      }
     }
-  }
-};
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-neutral-900">
       <div className="absolute inset-0 bg-black/70" />
-
       <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           {/* Logo */}
@@ -68,7 +68,7 @@ export default function ActivateAccount() {
             <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
               <div className="w-3 h-3 bg-white rotate-45" />
             </div>
-            <div className="tracking-widest test-yellow-600 font-semibold">RED PRODUCT</div>
+            <div className="tracking-widest text-yellow-600 font-semibold">RED PRODUCT</div>
           </div>
 
           {/* Card */}
@@ -78,7 +78,6 @@ export default function ActivateAccount() {
             </h2>
 
             <div className="text-center py-4">
-              {/* État initial : Propose l'activation */}
               {status.type === "idle" && (
                 <div className="flex flex-col items-center gap-6">
                   <p className="text-neutral-600">
@@ -93,7 +92,6 @@ export default function ActivateAccount() {
                 </div>
               )}
 
-              {/* État : Chargement */}
               {status.type === "loading" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-12 h-12 border-4 border-neutral-200 border-t-neutral-600 rounded-full animate-spin"></div>
@@ -101,7 +99,6 @@ export default function ActivateAccount() {
                 </div>
               )}
 
-              {/* État : Succès */}
               {status.type === "success" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -114,7 +111,6 @@ export default function ActivateAccount() {
                 </div>
               )}
 
-              {/* État : Erreur */}
               {status.type === "error" && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">

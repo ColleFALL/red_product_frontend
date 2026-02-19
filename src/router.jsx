@@ -20,7 +20,8 @@ export const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
   {path: "/password-reset/:uid/:token",element: <ResetPassword />,},
-  { path: "/activate/:uid/:token", element: <ActivateAccount /> },  // ✅ NOUVEAU
+  // { path: "/activate/:uid/:token", element: <ActivateAccount /> },  // ✅ NOUVEAU
+  { path: "/activate", element: <ActivateAccount /> },
 
 
   //  Layout dashboard + pages internes

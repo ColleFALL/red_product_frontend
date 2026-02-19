@@ -1,30 +1,28 @@
-
 import { api, setToken } from "./apiClient";
 
 /**
  * Login avec Djoser JWT
  */
 export async function loginApi({ email, password, remember }) {
-  const data = await api.post(
+  const response = await api.post(
     "/api/auth/jwt/create/",
     { email, password },
     { auth: false }
   );
 
-  const access = data?.access;
-  const refresh = data?.refresh;
+  const { access, refresh } = response || {};
 
   if (!access) {
     throw new Error("Token access manquant dans la réponse API.");
   }
 
   setToken(access, refresh);
-  
+
   if (remember) {
     localStorage.setItem("rememberMe", "true");
   }
 
-  return data;
+  return response;
 }
 
 /**
@@ -35,7 +33,7 @@ export async function registerApi({ name, email, password, accept }) {
     throw new Error("Vous devez accepter les termes et conditions.");
   }
 
-  const data = await api.post(
+  const response = await api.post(
     "/api/auth/users/",
     {
       email,
@@ -46,60 +44,70 @@ export async function registerApi({ name, email, password, accept }) {
     { auth: false }
   );
 
-  return data;
+  return response;
 }
 
 /**
  * Activer le compte
  */
 export async function activateAccountApi({ uid, token }) {
-  const data = await api.post(
+  // ✅ On encode le token pour éviter les problèmes de caractères spéciaux (=, +, /)
+  const token_encoded = encodeURIComponent(token);
+
+  const response = await api.post(
     "/api/auth/users/activation/",
-    { uid, token },
+    { uid, token: token_encoded },
     { auth: false }
   );
 
-  return data;
+  return response;
 }
 
 /**
  * Renvoyer l'email d'activation
  */
 export async function resendActivationApi(email) {
-  const data = await api.post(
+  const response = await api.post(
     "/api/auth/users/resend_activation/",
     { email },
     { auth: false }
   );
 
-  return data;
+  return response;
 }
 
 /**
  * Récupérer le profil utilisateur
  */
 export async function meApi() {
-  return api.get("/api/auth/users/me/", { auth: true });
+  const response = await api.get("/api/auth/users/me/", { auth: true });
+  return response;
 }
 
 /**
  * Forgot Password
  */
 export async function forgotPasswordApi(email) {
-  return api.post(
+  const response = await api.post(
     "/api/auth/users/reset_password/",
     { email },
     { auth: false }
   );
+
+  return response;
 }
 
 /**
  * Reset Password
  */
 export async function resetPasswordApi({ uid, token, new_password }) {
-  return api.post(
+  const token_encoded = encodeURIComponent(token);
+
+  const response = await api.post(
     "/api/auth/users/reset_password_confirm/",
-    { uid, token, new_password },
+    { uid, token: token_encoded, new_password },
     { auth: false }
   );
+
+  return response;
 }
